@@ -62,6 +62,20 @@ src/
 - [TODO 리스트](./docs/TODO.md)
 - [오류 로그](./docs/ERRORS.md)
 - [디자인 시스템](./docs/DESIGN_SYSTEM.md)
+- [습관 CRUD 기능](./docs/habit-crud.md)
+- [일일 체크 시스템](./docs/daily-check-system.md)
+- [인증 시스템](./docs/AUTH_SYSTEM.md)
+- [Supabase 설정](./docs/SUPABASE_SETUP.md)
+
+## ✨ 구현된 기능
+- ✅ 사용자 인증 시스템 (로그인/회원가입)
+- ✅ 습관 CRUD 기능 (생성/수정/삭제/조회)
+- ✅ 일일 체크 시스템 (주간 뷰, 진행률 표시)
+- ✅ 실시간 데이터 동기화
+- ✅ 반응형 디자인 (모바일 최적화)
+- ✅ TypeScript 타입 안정성
+- ✅ 성능 최적화 (TanStack Query 캐싱)
+- ✅ 에러 처리 및 사용자 피드백
 
 ## 🎮 게이미피케이션
 - 레벨 및 경험치 시스템
