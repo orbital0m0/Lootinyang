@@ -1,0 +1,62 @@
+name: Create Release
+
+on:
+  push:
+    tags: [ 'v*' ]
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Build project
+      run: npm run build
+      
+    - name: Create Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Lootinyang ${{ github.ref }}
+        body: |
+          ## 🎉 Lootinyang 새 버전 릴리즈!
+          
+          ### 변경사항
+          - 새로운 기능 추가
+          - 버그 수정
+          - 성능 개선
+          
+          ### 설치 방법
+          ```bash
+          npm install
+          npm run dev
+          ```
+          
+          ### 다운로드
+          - [Build Files](https://github.com/orbital0m0/Lootinyang/releases/tag/${{ github.ref }})
+        draft: false
+        prerelease: false
+        
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./dist
+        asset_name: lootinyang-build.zip
+        asset_content_type: application/zip
