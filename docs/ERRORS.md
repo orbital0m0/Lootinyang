@@ -1,7 +1,43 @@
 # 🐛 오류 및 문제 해결 로그
 
 ## 🚨 현재 진행 중인 이슈
-- (현재 없음)
+
+### 2026-01-06 - TypeScript 및 ESLint 오류
+**문제**: Supabase 데이터베이스 스키마 설계 테스트 코드에서 타입 오류 발생
+- **에러 메시지**: 
+  - `Unexpected any. Specify a different type` (multiple occurrences)
+  - `'supabaseHelpers' is defined but never used`
+  - `'User' is defined but never used`
+  - `'HabitFormData' is defined but never used`
+  - `Fast refresh only works when a file only exports components`
+- **원인**: 
+  1. `any` 타입 사용으로 TypeScript 엄격 모드 위반
+  2. 사용하지 않는 import 변수
+  3. 테스트 유틸리티 함수와 React 컴포넌트를 같은 파일에 배치
+- **해결 방안**: 
+  1. 구체적인 타입으로 `any` 대체
+  2. 사용하지 않는 import 제거
+  3. 테스트 유틸리티를 별도 파일로 분리
+- **상태**: ✅ 해결됨
+
+---
+
+## ✅ 해결된 이슈
+
+### 2026-01-06 - TypeScript 및 ESLint 오류 (수정 완료)
+**문제**: Supabase 데이터베이스 스키마 설계 테스트 코드에서 타입 오류 발생
+- **에러 메시지**: 
+  - `Unexpected any. Specify a different type` (multiple occurrences)
+  - `'supabaseHelpers' is defined but never used`
+  - `'User' is defined but never used`
+  - `'HabitFormData' is defined but never used`
+  - `Fast refresh only works when a file only exports components`
+- **해결 과정**:
+  1. `any` 타입을 구체적인 타입으로 대체 (`Habit`, `Item`, `RewardBox`, `unknown`)
+  2. 사용하지 않는 import 제거
+  3. 테스트 유틸리티와 React 컴포넌트를 분리
+  4. ESLint 경고 해결 (불필요한 disable 지시어 제거)
+- **상태**: ✅ 해결됨
 
 ---
 

@@ -213,6 +213,8 @@ export const ANIMATIONS = {
   },
 } as const;
 
+import type { Item } from '../types';
+
 // 유틸리티 함수
 export const UTILS = {
   // 경험치 계산
@@ -239,7 +241,7 @@ export const UTILS = {
   },
   
   // 랜덤 아이템 선택
-  getRandomItem(rarity?: string): any {
+  getRandomItem(rarity?: string): Item {
     let availableItems = ITEMS_DATA;
     if (rarity) {
       availableItems = ITEMS_DATA.filter(item => item.rarity === rarity);

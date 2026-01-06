@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import type { Habit, Item, RewardBox } from '../types';
 
 // Supabase 설정 - 실제 프로젝트 값으로 교체 필요
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://your-project.supabase.co';
@@ -56,7 +57,7 @@ export const supabaseHelpers = {
     return data;
   },
 
-  async createHabit(habit: Omit<any, 'id' | 'created_at' | 'updated_at'>) {
+  async createHabit(habit: Omit<Habit, 'id' | 'created_at' | 'updated_at'>) {
     const { data, error } = await supabase
       .from('habits')
       .insert(habit)
@@ -67,7 +68,7 @@ export const supabaseHelpers = {
     return data;
   },
 
-  async updateHabit(id: string, updates: Partial<any>) {
+  async updateHabit(id: string, updates: Partial<Habit>) {
     const { data, error } = await supabase
       .from('habits')
       .update({ ...updates, updated_at: new Date().toISOString() })
@@ -145,7 +146,7 @@ export const supabaseHelpers = {
     return data;
   },
 
-  async createRewardBox(rewardBox: Omit<any, 'id' | 'created_at'>) {
+  async createRewardBox(rewardBox: Omit<RewardBox, 'id' | 'created_at'>) {
     const { data, error } = await supabase
       .from('reward_boxes')
       .insert(rewardBox)
@@ -156,7 +157,7 @@ export const supabaseHelpers = {
     return data;
   },
 
-  async openRewardBox(boxId: string, items: any[]) {
+  async openRewardBox(boxId: string, items: Item[]) {
     const { data, error } = await supabase
       .from('reward_boxes')
       .update({
@@ -215,7 +216,7 @@ export const supabaseHelpers = {
 
 // 실시-time 구독을 위한 함수들
 export const supabaseSubscriptions = {
-  subscribeToHabits(userId: string, callback: (payload: any) => void) {
+  subscribeToHabits(userId: string, callback: (payload: unknown) => void) {
     return supabase
       .channel('habits_changes')
       .on(
@@ -225,13 +226,13 @@ export const supabaseSubscriptions = {
           schema: 'public',
           table: 'habits',
           filter: `user_id=eq.${userId}`,
-        },
+        } as const,
         callback
       )
       .subscribe();
   },
 
-  subscribeToDailyChecks(habitId: string, callback: (payload: any) => void) {
+  subscribeToDailyChecks(habitId: string, callback: (payload: unknown) => void) {
     return supabase
       .channel('daily_checks_changes')
       .on(
@@ -241,7 +242,7 @@ export const supabaseSubscriptions = {
           schema: 'public',
           table: 'daily_checks',
           filter: `habit_id=eq.${habitId}`,
-        },
+        } as const,
         callback
       )
       .subscribe();
