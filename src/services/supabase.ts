@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import type { Habit, Item, RewardBox } from '../types';
+import type { User, Habit, RewardBox, Item } from '../types';
 
 // Supabase 설정 - 실제 프로젝트 값으로 교체 필요
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://your-project.supabase.co';
@@ -134,6 +134,17 @@ export const supabaseHelpers = {
     return data;
   },
 
+  // 아이템 관련
+  async getItems() {
+    const { data, error } = await supabase
+      .from('items')
+      .select('*')
+      .order('created_at', { ascending: true });
+    
+    if (error) throw error;
+    return data;
+  },
+
   // 보상 상자 관련
   async getRewardBoxes(userId: string) {
     const { data, error } = await supabase
@@ -149,7 +160,7 @@ export const supabaseHelpers = {
   async createRewardBox(rewardBox: Omit<RewardBox, 'id' | 'created_at'>) {
     const { data, error } = await supabase
       .from('reward_boxes')
-      .insert(rewardBox)
+      .insert({ ...rewardBox, created_at: new Date().toISOString() })
       .select()
       .single();
     
@@ -206,6 +217,19 @@ export const supabaseHelpers = {
         achievement_id: achievementId,
         unlocked_at: new Date().toISOString(),
       })
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  // 사용자 정보 업데이트
+  async updateUser(id: string, updates: Partial<User>) {
+    const { data, error } = await supabase
+      .from('users')
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq('id', id)
       .select()
       .single();
     

@@ -102,6 +102,9 @@ export interface UseHabitsReturn {
   updateHabit: (id: string, habit: Partial<Habit>) => Promise<void>;
   deleteHabit: (id: string) => Promise<void>;
   refetch: () => void;
+  isCreating: boolean;
+  isUpdating: boolean;
+  isDeleting: boolean;
 }
 
 export interface UseDailyChecksReturn {
@@ -110,7 +113,79 @@ export interface UseDailyChecksReturn {
   error: string | null;
   checkHabit: (habitId: string, date: string) => Promise<void>;
   uncheckHabit: (habitId: string, date: string) => Promise<void>;
-  getWeeklyProgress: (habitId: string) => number;
+  getWeeklyProgress: (habitId: string, weeklyTarget: number) => number;
+  isTodayChecked: (habitId: string) => boolean;
+  isDateChecked: (habitId: string, date: string) => boolean;
+  getCheckedDatesThisWeek: (habitId: string) => string[];
+  refetch: () => void;
+  isChecking: boolean;
+  isUnchecking: boolean;
+}
+
+export interface UseUserReturn {
+  user: User | null;
+  loading: boolean;
+  error: string | null;
+  updateUser: (updates: Partial<User>) => Promise<void>;
+  addExp: (exp: number) => Promise<void>;
+  updateStreak: (streak: number) => Promise<void>;
+  getExpToNextLevel: () => number;
+  canLevelUp: () => boolean;
+  isUpdating: boolean;
+  isAddingExp: boolean;
+  isUpdatingStreak: boolean;
+}
+
+export interface UseRewardsReturn {
+  rewardBoxes: RewardBox[];
+  availableBoxes: RewardBox[];
+  openedBoxes: RewardBox[];
+  loading: boolean;
+  error: string | null;
+  refetch: () => void;
+  getBoxesByType: (type: RewardBox['type']) => RewardBox[];
+  getAvailableCount: (type: RewardBox['type']) => number;
+  getBoxAnimationClass: (boxType: RewardBox['type']) => string;
+  getBoxIcon: (boxType: RewardBox['type']) => string;
+  getBoxColorTheme: (boxType: RewardBox['type']) => string;
+}
+
+export interface UseAchievementsReturn {
+  allAchievements: Achievement[];
+  userAchievements: UserAchievement[];
+  loading: boolean;
+  error: string | null;
+  refetch: () => void;
+  unlockAchievement: (achievementId: string) => Promise<boolean>;
+  getAchievementsByCategory: () => {
+    challenge: Achievement[];
+    consistency: Achievement[];
+    reward: Achievement[];
+    legendary: Achievement[];
+  };
+  getProgressByAchievement: (achievementId: string) => number;
+  getStatsByCategory: () => {
+    overall: { total: number; unlocked: number; percentage: number };
+    categories: {
+      category: string;
+      total: number;
+      unlocked: number;
+      percentage: number;
+    }[];
+  };
+  isAchievementUnlocked: (achievementId: string) => boolean;
+  getTotalPoints: () => number;
+  getLockedAchievements: () => Achievement[];
+  getUnlockedAchievements: () => (UserAchievement & { achievement: Achievement })[];
+}
+
+export interface UseDailyChecksReturn {
+  dailyChecks: DailyCheck[];
+  loading: boolean;
+  error: string | null;
+  checkHabit: (habitId: string, date: string) => Promise<void>;
+  uncheckHabit: (habitId: string, date: string) => Promise<void>;
+  getWeeklyProgress: (habitId: string, weeklyTarget: number) => number;
 }
 
 // 게임 관련 타입

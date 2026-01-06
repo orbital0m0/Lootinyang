@@ -7,6 +7,7 @@ import { Rewards } from './pages/Rewards';
 import { Profile } from './pages/Profile';
 import { Achievements } from './pages/Achievements';
 import { DatabaseTest } from './pages/DatabaseTest';
+import { AuthPage } from './pages/Auth';
 
 // React Query 클라이언트 생성
 const queryClient = new QueryClient({
@@ -54,6 +55,11 @@ const router = createBrowserRouter([
         element: <DatabaseTest />,
       },
     ],
+  },
+  {
+    path: '/auth',
+    element: <AuthPage />,
+    errorElement: <div className="text-center p-8">인증 오류가 발생했습니다.</div>,
   },
 ]);
 

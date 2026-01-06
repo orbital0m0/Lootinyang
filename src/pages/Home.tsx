@@ -1,7 +1,16 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useUser } from '../hooks';
 
 export function Home() {
+  const { user } = useUser();
   const [isLoading, setIsLoading] = useState(false);
+
+  // 인증되지 않은 경우 로그인 페이지로 이동
+  useEffect(() => {
+    if (!user) {
+      window.location.href = '/auth';
+    }
+  }, [user]);
 
   return (
     <div className="p-4 space-y-6">
