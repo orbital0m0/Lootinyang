@@ -3,15 +3,16 @@ import { useState } from 'react';
 // 고양이 캐릭터 감정 상태
 export type CatMood = 'happy' | 'normal' | 'sleepy' | 'excited';
 
-// 고양이 캐릭터 컴포넌트 props
+// 고양이 캐릭터 props
 interface CatCharacterProps {
   mood?: CatMood;
   size?: 'sm' | 'md' | 'lg';
   className?: string;
+  onMoodChange?: (mood: CatMood) => void;
 }
 
 // 고양이 캐릭터 컴포넌트
-export function CatCharacter({ mood = 'normal', size = 'md', className = '' }: CatCharacterProps) {
+export function CatCharacter({ mood = 'normal', size = 'md', className = '', onMoodChange }: CatCharacterProps) {
   const sizeClasses = {
     sm: 'w-12 h-12',
     md: 'w-16 h-16',
@@ -37,6 +38,13 @@ export function CatCharacter({ mood = 'normal', size = 'md', className = '' }: C
     normal: 'w-4 h-1.5',
     sleepy: 'w-3 h-1',
     excited: 'w-7 h-2.5',
+  };
+
+  const accessoryClasses = {
+    happy: 'translate-y-[-4px] translate-x-1/2 scale-150',
+    normal: 'translate-y-[-2px] translate-x-1/2 scale-100',
+    sleepy: 'translate-y-[0px] translate-x-1/2 scale-75',
+    excited: 'translate-y-[-6px] translate-x-1/2 scale-200',
   };
 
   return (
@@ -72,7 +80,7 @@ export function CatCharacter({ mood = 'normal', size = 'md', className = '' }: C
         
         {/* 졸린 때 하트 */}
         {mood === 'sleepy' && (
-          <div className="absolute top-6 left-1/2 transform -translate-x-1/2 text-red-400 text-2xl animate-bounce-slow">
+          <div className="absolute top-6 left-1/2 transform -translate-x-1/2 text-error-400 text-2xl animate-bounce-slow">
             <span className="inline-block">💤</span>
           </div>
         )}
@@ -83,6 +91,13 @@ export function CatCharacter({ mood = 'normal', size = 'md', className = '' }: C
             <span className="inline-block">💖</span>
           </div>
         )}
+        
+        {/* 흥분할 때 하트 */}
+        {mood === 'excited' && (
+          <div className="absolute top-6 left-1/2 transform -translate-x-1/2 text-cat-pink-dark text-2xl animate-pulse-slow">
+            <span className="inline-block">😸</span>
+          </div>
+        )}
       </div>
       
       {/* 꼬리 */}
@@ -90,9 +105,18 @@ export function CatCharacter({ mood = 'normal', size = 'md', className = '' }: C
         <div className={`w-3 h-8 bg-cat-orange rounded-full ${mood === 'happy' ? 'animate-wiggle' : ''}`} 
              style={{ transformOrigin: 'top center' }}>
           {/* 꼬리 털 */}
-          <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-1 h-4 bg-cat-pink-dark rounded-full" />
+          <div className="absolute -top-1 left-1/2 w-1 h-4 bg-cat-pink-dark rounded-full" />
         </div>
       </div>
+      
+      {/* 감정 전환 버튼 */}
+      <button
+        onClick={() => onMoodChange?.('happy')}
+        className={`absolute -bottom-4 left-1/2 transform -translate-y-1/2 p-1.5 rounded-full ${accessoryClasses[mood]} transition-transform duration-200 hover:scale-110 active:scale-95`}
+        aria-label="행복 상태 전환"
+      >
+        <span className="text-xl">😊</span>
+      </button>
     </div>
   );
 }
