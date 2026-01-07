@@ -1,5 +1,3 @@
-import { useState } from 'react';
-
 // 고양이 캐릭터 감정 상태
 export type CatMood = 'happy' | 'normal' | 'sleepy' | 'excited';
 

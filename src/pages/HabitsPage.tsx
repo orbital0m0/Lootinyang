@@ -294,7 +294,7 @@ export function HabitsPage() {
                       }
                     }}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
-                  required
+                    required
                   >
                     <option value="1">주 1회</option>
                     <option value="2">주 2회</option>
@@ -303,18 +303,19 @@ export function HabitsPage() {
                     <option value="5">주 5회</option>
                     <option value="6">주 6회</option>
                     <option value="7">주 7회</option>
-                </select>
+                  </select>
+                </div>
               </div>
-            </div>
 
-            <button
-              type="submit"
-              disabled={isCreating}
-              className="w-full btn-primary mt-4"
-            >
-              {isCreating ? '생성 중...' : (editingHabit ? '수정' : '생성')}
-            </button>
-          </form>
+              <button
+                type="submit"
+                disabled={isCreating}
+                className="w-full btn-primary mt-4"
+              >
+                {isCreating ? '생성 중...' : (editingHabit ? '수정' : '생성')}
+              </button>
+            </form>
+          </div>
         </div>
       )}
     </div>
