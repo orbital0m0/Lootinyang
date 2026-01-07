@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "useDefineForClassFields": true,
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "types": ["vitest/globals", "@testing-library/jest-dom"],
+    "jsx": "react-jsx",
+    "esModuleInterop": true,
+    "strict": false,
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*.test.tsx", "src/**/*.test.ts"]
+}
