@@ -1,5 +1,6 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Layout } from './components/Layout';
 import { Home } from './pages/Home';
 import { HabitsPage } from './pages/HabitsPage';
@@ -8,6 +9,25 @@ import { Profile } from './pages/Profile';
 import { Achievements } from './pages/Achievements';
 import { DatabaseTest } from './pages/DatabaseTest';
 import { AuthPage } from './pages/Auth';
+
+// 페이지 전환 애니메이션 래퍼 컴포넌트
+function PageTransition({ children }: { children: React.ReactNode }) {
+  const location = useLocation();
+
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={location.pathname}
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -20 }}
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
+      >
+        {children}
+      </motion.div>
+    </AnimatePresence>
+  );
+}
 
 // React Query 클라이언트 생성
 const queryClient = new QueryClient({
@@ -32,33 +52,33 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Home />,
+        element: <PageTransition><Home /></PageTransition>,
       },
       {
         path: 'habits',
-        element: <HabitsPage />,
+        element: <PageTransition><HabitsPage /></PageTransition>,
       },
       {
         path: 'rewards',
-        element: <Rewards />,
+        element: <PageTransition><Rewards /></PageTransition>,
       },
       {
         path: 'profile',
-        element: <Profile />,
+        element: <PageTransition><Profile /></PageTransition>,
       },
       {
         path: 'achievements',
-        element: <Achievements />,
+        element: <PageTransition><Achievements /></PageTransition>,
       },
       {
         path: 'test',
-        element: <DatabaseTest />,
+        element: <PageTransition><DatabaseTest /></PageTransition>,
       },
     ],
   },
   {
     path: '/auth',
-    element: <AuthPage />,
+    element: <PageTransition><AuthPage /></PageTransition>,
     errorElement: <div className="text-center p-8">인증 오류가 발생했습니다.</div>,
   },
 ]);
