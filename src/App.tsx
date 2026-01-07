@@ -2,7 +2,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Layout } from './components/Layout';
 import { Home } from './pages/Home';
-import { Habits } from './pages/Habits';
+import { HabitsPage } from './pages/HabitsPage';
 import { Rewards } from './pages/Rewards';
 import { Profile } from './pages/Profile';
 import { Achievements } from './pages/Achievements';
@@ -36,7 +36,7 @@ const router = createBrowserRouter([
       },
       {
         path: 'habits',
-        element: <Habits />,
+        element: <HabitsPage />,
       },
       {
         path: 'rewards',

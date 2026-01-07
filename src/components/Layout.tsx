@@ -1,3 +1,6 @@
+import { useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+
 // 레이아웃 컴포넌트 props 타입
 export interface LayoutProps {
   children?: React.ReactNode;
@@ -5,6 +8,15 @@ export interface LayoutProps {
 
 // 메인 레이아웃 컴포넌트
 export function Layout({ children }: LayoutProps) {
+  const location = useLocation();
+
+  const navItems = [
+    { path: '/', icon: '🏠', label: '홈' },
+    { path: '/habits', icon: '🐱', label: '습관' },
+    { path: '/achievements', icon: '🏆', label: '업적' },
+    { path: '/profile', icon: '👤', label: '프로필' },
+  ];
+
   return (
     <div className="mini-app-container">
       {/* 헤더 */}
@@ -19,7 +31,7 @@ export function Layout({ children }: LayoutProps) {
               <div className="text-sm text-gray-600">
                 Lv.1
               </div>
-              <div className="w-8 h-8 rounded-full bg-primary-500 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cat-orange to-cat-pink flex items-center justify-center shadow-md">
                 <span className="text-white text-sm">🐱</span>
               </div>
             </div>
@@ -27,7 +39,7 @@ export function Layout({ children }: LayoutProps) {
         </div>
       </header>
 
-      {/* 메인 콘텐츠 */}
+      {/* 메인 컨텐츠 */}
       <main className="pb-16">
         {children}
       </main>
@@ -35,34 +47,18 @@ export function Layout({ children }: LayoutProps) {
       {/* 하단 네비게이션 */}
       <nav className="bottom-nav">
         <div className="flex justify-around py-2">
-          <a 
-            href="/" 
-            className="nav-item active"
-          >
-            <span className="text-xl mb-1">🏠</span>
-            <span className="text-xs">홈</span>
-          </a>
-          <a 
-            href="/habits" 
-            className="nav-item"
-          >
-            <span className="text-xl mb-1">✅</span>
-            <span className="text-xs">습관</span>
-          </a>
-          <a 
-            href="/rewards" 
-            className="nav-item"
-          >
-            <span className="text-xl mb-1">🎁</span>
-            <span className="text-xs">보상</span>
-          </a>
-          <a 
-            href="/profile" 
-            className="nav-item"
-          >
-            <span className="text-xl mb-1">👤</span>
-            <span className="text-xs">프로필</span>
-          </a>
+          {navItems.map((item) => (
+            <Link
+              key={item.path}
+              to={item.path}
+              className={`nav-item ${
+                location.pathname === item.path ? 'active' : ''
+              }`}
+            >
+              <span className="text-2xl mb-1">{item.icon}</span>
+              <span className="text-xs font-medium">{item.label}</span>
+            </Link>
+          ))}
         </div>
       </nav>
     </div>

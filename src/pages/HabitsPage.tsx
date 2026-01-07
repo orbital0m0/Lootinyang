@@ -97,39 +97,39 @@ export function HabitsPage() {
     <div className="p-4 space-y-4 max-w-md mx-auto">
       {/* 페이지 헤더 */}
       <div className="text-center mb-8">
-        <span className="text-6xl">🐱</span>
-        <h1 className="text-3xl font-bold text-gray-800 mt-4">내 습관</h1>
+        <span className="text-6xl animate-bounce-slow">🐱</span>
+        <h1 className="font-heading text-gray-800 mt-4">내 습관</h1>
       </div>
 
       {/* 습관 통계 */}
       <div className="grid grid-cols-3 gap-3 mb-6">
-        <div className="text-center">
+        <div className="card text-center">
           <span className="text-3xl mb-2">📅</span>
-          <p className="text-2xl font-bold text-gray-700">{habits.length}개</p>
+          <p className="text-heading-lg font-bold text-gray-700">{habits.length}개</p>
         </div>
-        <div className="text-center">
+        <div className="card text-center">
           <span className="text-3xl mb-2">🎯</span>
-          <p className="text-2xl font-bold text-gray-700">완료율 {Math.round(
-            habits.length > 0 ? 
-              habits.reduce((total, habit) => total + getWeeklyProgress(habit), 0) / habits.length : 
+          <p className="text-heading-lg font-bold text-gray-700">완료율 {Math.round(
+            habits.length > 0 ?
+              habits.reduce((total, habit) => total + getWeeklyProgress(habit), 0) / habits.length :
               0
           )}%
           </p>
         </div>
-        <div className="text-center">
+        <div className="card text-center">
           <span className="text-3xl mb-2">🔥</span>
-          <p className="text-2xl font-bold text-gray-700">스트릭 {user?.streak || 0}일</p>
+          <p className="text-heading-lg font-bold text-gray-700">스트릭 {user?.streak || 0}일</p>
         </div>
       </div>
 
       {/* 습관 목록 */}
       <div className="space-y-3">
         {habits.length === 0 ? (
-          <div className="text-center py-8">
-            <p className="text-gray-500">아직 습관이 없습니다.</p>
+          <div className="card text-center py-8">
+            <p className="text-body-lg text-gray-500">아직 습관이 없습니다.</p>
             <button
               onClick={() => setShowForm(true)}
-              className="btn-cat"
+              className="btn-cat mt-4"
             >
               + 첫 습관
             </button>
@@ -141,14 +141,14 @@ export function HabitsPage() {
                 <div className="flex items-center space-x-3">
                   <div className="flex-1">
                     <div className="text-2xl mb-1">
-                      {habit.name === '운동하기' ? '🏃' : 
-                       habit.name === '독서하기' ? '📚' : 
-                       habit.name === '명상' ? '🧘' : 
+                      {habit.name === '운동하기' ? '🏃' :
+                       habit.name === '독서하기' ? '📚' :
+                       habit.name === '명상' ? '🧘' :
                        habit.name === '운동' ? '💪' : '🐱'}
                     </div>
                     <div className="ml-2">
-                      <h3 className="font-semibold">{habit.name}</h3>
-                      <p className="text-sm text-gray-500">주 {habit.weekly_target}회 목표</p>
+                      <h3 className="font-heading">{habit.name}</h3>
+                      <p className="text-body-sm text-gray-500">주 {habit.weekly_target}회 목표</p>
                     </div>
                   </div>
                 </div>
@@ -159,23 +159,23 @@ export function HabitsPage() {
                   <button
                     onClick={() => handleCheck(habit.id)}
                     disabled={isChecking}
-                    className={`btn-secondary text-xs ${
+                    className={`btn-icon text-lg ${
                       isTodayChecked(habit.id)
-                        ? 'opacity-50 cursor-not-allowed' 
-                        : 'hover:bg-primary-100 hover:text-white'
+                        ? 'opacity-50 cursor-not-allowed'
+                        : 'hover:bg-primary-100'
                     }`}
                   >
                     {isTodayChecked(habit.id) ? '✅' : '⭕'}
                   </button>
                   <button
                     onClick={() => setEditingHabit(habit)}
-                    className="btn-secondary text-xs"
+                    className="btn-icon"
                   >
                     ✏️
                   </button>
                   <button
                     onClick={() => handleDeleteHabit(habit.id)}
-                    className="btn-secondary text-xs text-red-500"
+                    className="btn-icon text-error-500"
                   >
                     🗑️
                   </button>
@@ -184,12 +184,12 @@ export function HabitsPage() {
 
               {/* 주간 진행률 */}
               <div className="mt-3">
-                <div className="flex justify-between text-sm mb-1">
+                <div className="flex justify-between text-body-sm mb-1">
                   <span>이번 주 진행률</span>
-                  <span className="font-medium">{getWeeklyProgress(habit).toFixed(0)}%</span>
+                  <span className="font-heading-md">{getWeeklyProgress(habit).toFixed(0)}%</span>
                 </div>
-                <div className="progress-bar">
-                  <div 
+                <div className="progress-bar-cat">
+                  <div
                     className="progress-fill-cat"
                     style={{ width: `${getWeeklyProgress(habit)}%` }}
                   />
@@ -231,15 +231,15 @@ export function HabitsPage() {
 
       {/* 생성/편집 폼 */}
       {showForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl shadow-xl p-6 max-w-md w-full">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 animate-fade-in">
+          <div className="card max-w-md w-full">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-800">
+              <h3 className="font-heading text-gray-800">
                 {editingHabit ? '습관 수정' : '새 습관'}
               </h3>
               <button
                 onClick={handleCloseForm}
-                className="text-gray-500 hover:text-gray-700"
+                className="btn-icon"
               >
                 ✕
               </button>
@@ -260,7 +260,7 @@ export function HabitsPage() {
             }}>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-body font-medium text-gray-700 mb-2">
                     습관 이름
                   </label>
                   <input
@@ -273,14 +273,14 @@ export function HabitsPage() {
                         setNewHabitName(e.target.value);
                       }
                     }}
-                    className="w-full px-3 py-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
                     placeholder="예: 운동하기"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-body font-medium text-gray-700 mb-2">
                     주 목표
                   </label>
                   <select
@@ -293,7 +293,7 @@ export function HabitsPage() {
                         setNewHabitTarget(value);
                       }
                     }}
-                    className="w-full px-3 py-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
                   required
                   >
                     <option value="1">주 1회</option>
@@ -316,7 +316,6 @@ export function HabitsPage() {
             </button>
           </form>
         </div>
-      </div>
       )}
     </div>
   );
