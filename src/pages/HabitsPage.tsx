@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useHabits, useDailyChecks, useUser } from '../hooks';
 import type { Habit } from '../types';
 
@@ -14,6 +15,9 @@ export function HabitsPage() {
   // 새 습관 폼 상태
   const [newHabitName, setNewHabitName] = useState('');
   const [newHabitTarget, setNewHabitTarget] = useState(3);
+
+  // 체크 애니메이션 상태
+  const [celebratingHabitId, setCelebratingHabitId] = useState<string | null>(null);
 
   // 폼 닫기 핸들러
   const handleCloseForm = () => {
@@ -48,11 +52,14 @@ export function HabitsPage() {
   const handleCheck = async (habitId: string, date?: string) => {
     const targetDate = date || new Date().toISOString().split('T')[0];
     const isChecked = isTodayChecked(habitId);
-    
+
     if (isChecked) {
       await uncheckHabit(habitId, targetDate);
     } else {
       await checkHabit(habitId, targetDate);
+      // 체크 성공 시 축하 애니메이션 표시
+      setCelebratingHabitId(habitId);
+      setTimeout(() => setCelebratingHabitId(null), 2000);
     }
   };
 
@@ -156,29 +163,81 @@ export function HabitsPage() {
 
               <div>
                 <div className="flex items-center space-x-2">
-                  <button
+                  <AnimatePresence>
+                    {celebratingHabitId === habit.id && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 1.5 }}
+                        className="absolute inset-0 flex items-center justify-center pointer-events-none"
+                        transition={{ duration: 0.5 }}
+                      >
+                        {[...Array(5)].map((_, i) => (
+                          <motion.span
+                            key={i}
+                            className="absolute text-2xl"
+                            initial={{ opacity: 1, scale: 1, y: 0 }}
+                            animate={{
+                              opacity: 0,
+                              scale: 1.5,
+                              y: -50 - i * 10,
+                              x: (Math.random() - 0.5) * 50,
+                            }}
+                            transition={{
+                              duration: 1,
+                              delay: i * 0.1,
+                            }}
+                          >
+                            {'✨🎉🎊'[i % 3]}
+                          </motion.span>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  <motion.button
                     onClick={() => handleCheck(habit.id)}
                     disabled={isChecking}
-                    className={`btn-icon text-lg ${
+                    className={`btn-icon text-lg relative ${
                       isTodayChecked(habit.id)
                         ? 'opacity-50 cursor-not-allowed'
                         : 'hover:bg-primary-100'
                     }`}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 17 }}
                   >
-                    {isTodayChecked(habit.id) ? '✅' : '⭕'}
-                  </button>
-                  <button
+                    <motion.span
+                      animate={isTodayChecked(habit.id) ? {
+                        scale: [1, 1.3, 1],
+                        rotate: [0, 10, -10, 0],
+                      } : {}}
+                      transition={{
+                        duration: 0.5,
+                        ease: 'easeInOut',
+                      }}
+                    >
+                      {isTodayChecked(habit.id) ? '✅' : '⭕'}
+                    </motion.span>
+                  </motion.button>
+                  <motion.button
                     onClick={() => setEditingHabit(habit)}
                     className="btn-icon"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 17 }}
                   >
                     ✏️
-                  </button>
-                  <button
+                  </motion.button>
+                  <motion.button
                     onClick={() => handleDeleteHabit(habit.id)}
                     className="btn-icon text-error-500"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 17 }}
                   >
                     🗑️
-                  </button>
+                  </motion.button>
                 </div>
               </div>
 
