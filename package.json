@@ -14,7 +14,7 @@
     "test:watch": "vitest --watch",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
-    "deploy: "vercel --prod",
+    "deploy": "vercel --prod",
     "deploy:netlify": "netlify deploy --prod --dir=dist"
   },
   "dependencies": {
