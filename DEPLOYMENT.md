@@ -116,3 +116,78 @@ git subtree push --prefix dist origin gh-pages
 ### 3. 세이프 에어리어
 - 토스 미니앱의 세이프 에어리어를 사용하지 마세요
 - 모든 스타일을 inline으로 포함해야 합니다
+
+## 트러블슈팅
+
+### 1. package.json JSON 파싱 오류
+
+**증상:**
+```bash
+npm error code EJSONPARSE
+npm error JSON.parse Unexpected token "v" (0x76)
+```
+
+**원인:**
+- `package.json`의 `scripts` 섹션에서 JSON 문법 오류
+- 닫는 따옴표(`"`) 누락 또는 이중 따옴표 사용 오류
+
+**해결 방법:**
+1. `package.json` 파일을 열어 `scripts` 섹션 확인
+2. 다음 사항을 점검:
+   - 모든 문자열은 쌍따옴표(`"`)로 감싸야 함
+   - 키와 값 사이에는 콜론(`:`)이 필요
+   - 각 항목은 콤마(`,`)로 구분
+   - 마지막 항목 뒤에는 콤마 없음
+3. 빌드 테스트로 검증: `npm run build`
+
+**예시 (잘못된 예시):**
+```json
+"scripts": {
+  "deploy: "vercel --prod",
+  ...
+}
+```
+
+**예시 (올바른 예시):**
+```json
+"scripts": {
+  "deploy": "vercel --prod",
+  ...
+}
+```
+
+### 2. 빌드 실패
+
+**증상:**
+- `npm run build` 실행 중 오류 발생
+- TypeScript 타입 오류 또는 모듈 찾기 실패
+
+**해결 방법:**
+1. TypeScript 타입 체크: `npm run type-check`
+2. Lint 실행: `npm run lint`
+3. Lint 자동 수정: `npm run lint:fix`
+4. 의존성 재설치:
+   ```bash
+   rm -rf node_modules package-lock.json
+   npm install
+   ```
+
+### 3. 배포 후 라우팅 오류
+
+**증상:**
+- 배포 후 페이지 새로고침 시 404 오류
+- SPA 라우팅이 작동하지 않음
+
+**해결 방법:**
+1. Vercel 설정 확인: `vercel.json`
+2. Netlify 설정: `_redirects` 파일 생성
+3. GitHub Pages 설정: `vite.config.ts`의 `base` 경로 설정
+
+**Vercel 설정 예시:**
+```json
+{
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
+```
