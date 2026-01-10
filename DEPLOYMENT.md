@@ -10,7 +10,7 @@
 # 4. API Keys 확인 (Project URL, anon public key)
 ```
 
-### 2. 환경 변수 설정
+### 2. 로컬 환경 변수 설정
 ```bash
 # .env 파일 생성
 cp .env.example .env
@@ -20,7 +20,21 @@ cp .env.example .env
 # VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
 ```
 
-### 3. 의존성 설치
+### 3. Vercel 환경 변수 설정 (배포용)
+```bash
+# Vercel CLI로 환경 변수 설정
+vercel env add VITE_SUPABASE_URL production
+vercel env add VITE_SUPABASE_ANON_KEY production
+
+# 또는 Vercel Dashboard에서 설정
+# 1. https://vercel.com/orbital0m0s-projects/habit-cat-app/settings/environment-variables 접속
+# 2. 환경 변수 추가
+# 3. Production 환경에 VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY 설정
+```
+
+**중요:** Vercel에 배포하기 전에 반드시 환경 변수를 설정하세요. 설정하지 않으면 앱이 정상 작동하지 않습니다.
+
+### 4. 의존성 설치
 ```bash
 npm install
 ```
@@ -69,6 +83,20 @@ npm install -g vercel
 # 배포
 vercel --prod
 ```
+
+**Vercel 설정 파일 (`vercel.json`):**
+```json
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "cleanUrls": true,
+  "trailingSlash": true
+}
+```
+
+**주의사항:**
+- `env` 속성은 사용하지 마세요. 환경 변수는 Vercel Dashboard 또는 CLI로 설정합니다
+- `vercel.json`에 파일 경로를 직접 참조할 수 없습니다
 
 ### 옵션 2: Netlify
 ```bash
@@ -172,7 +200,42 @@ npm error JSON.parse Unexpected token "v" (0x76)
    npm install
    ```
 
-### 3. 배포 후 라우팅 오류
+### 3. Vercel env 속성 오류
+
+**증상:**
+```bash
+Error: The `env` property in vercel.json needs to be an object
+```
+
+**원인:**
+- `vercel.json`에서 `env` 속성에 문자열 값(파일 경로 등)을 사용
+- 환경 변수는 파일 참조가 아닌 Vercel에서 직접 설정해야 함
+
+**해결 방법:**
+1. `vercel.json`에서 `env` 속성 제거
+2. Vercel CLI로 환경 변수 설정:
+   ```bash
+   vercel env add VITE_SUPABASE_URL production
+   vercel env add VITE_SUPABASE_ANON_KEY production
+   ```
+3. 또는 Vercel Dashboard에서 설정
+
+**잘못된 예시:**
+```json
+{
+  "env": ".env.production"
+}
+```
+
+**올바른 예시:**
+```json
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist"
+}
+```
+
+### 4. 배포 후 라우팅 오류
 
 **증상:**
 - 배포 후 페이지 새로고침 시 404 오류
