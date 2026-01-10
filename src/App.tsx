@@ -7,6 +7,7 @@ import { HabitsPage } from './pages/HabitsPage';
 import { Rewards } from './pages/Rewards';
 import { Profile } from './pages/Profile';
 import { Achievements } from './pages/Achievements';
+import { CatRoom } from './pages/CatRoom';
 import { DatabaseTest } from './pages/DatabaseTest';
 import { AuthPage } from './pages/Auth';
 
@@ -69,6 +70,10 @@ const router = createBrowserRouter([
       {
         path: 'achievements',
         element: <PageTransition><Achievements /></PageTransition>,
+      },
+      {
+        path: 'cat-room',
+        element: <PageTransition><CatRoom /></PageTransition>,
       },
       {
         path: 'test',

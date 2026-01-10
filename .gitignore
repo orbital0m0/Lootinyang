@@ -60,3 +60,5 @@ logs/
 
 # 터비넥스
 .turbo
+
+.vercel
