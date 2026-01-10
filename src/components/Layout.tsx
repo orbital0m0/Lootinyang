@@ -1,5 +1,6 @@
 import { useLocation } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import { useEffect } from 'react';
 
 // 레이아웃 컴포넌트 props 타입
 export interface LayoutProps {
@@ -9,6 +10,19 @@ export interface LayoutProps {
 // 메인 레이아웃 컴포넌트
 export function Layout({ children }: LayoutProps) {
   const location = useLocation();
+
+  // 페이지 접속 시 한번만 강제 새로고침
+  useEffect(() => {
+    if (!sessionStorage.getItem('v2-loaded')) {
+      sessionStorage.setItem('v2-loaded', 'true');
+      window.location.reload();
+    }
+  }, []);
+
+  const handleForceRefresh = () => {
+    sessionStorage.removeItem('v2-loaded');
+    window.location.reload();
+  };
 
   const navItems = [
     { path: '/', icon: '🏠', label: '홈' },
@@ -24,9 +38,15 @@ export function Layout({ children }: LayoutProps) {
         <div className="px-4 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <span className="text-2xl">🐱</span>
-              <h1 className="text-lg font-bold text-gray-800">Lootinyang</h1>
-            </div>
+               <span className="text-2xl">🐱</span>
+               <h1 className="text-lg font-bold text-gray-800">Lootinyang</h1>
+             </div>
+             <button
+               onClick={handleForceRefresh}
+               className="ml-2 px-3 py-1 text-xs font-medium bg-gradient-to-r from-cat-orange to-cat-pink text-white rounded-full"
+             >
+               🔄
+             </button>
             <div className="flex items-center space-x-3">
               <div className="text-sm text-gray-600">
                 Lv.1
