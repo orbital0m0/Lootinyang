@@ -12,8 +12,8 @@ export function Layout({ children }: LayoutProps) {
 
   const navItems = [
     { path: '/', icon: '🏠', label: '홈' },
-    { path: '/habits', icon: '🐱', label: '습관' },
-    { path: '/achievements', icon: '🏆', label: '업적' },
+    { path: '/habits', icon: '📊', label: '트래커' },
+    { path: '/cat-room', icon: '🐱', label: '고양이 방' },
     { path: '/profile', icon: '👤', label: '프로필' },
   ];
 
