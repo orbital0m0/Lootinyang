@@ -83,7 +83,7 @@ export function Achievements() {
         {categories.map((category, index) => (
           <motion.button
             key={category.id}
-            onClick={() => setSelectedCategory(category.id as any)}
+            onClick={() => setSelectedCategory(category.id as 'all' | 'challenge' | 'consistency' | 'reward' | 'legendary')}
             className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
               selectedCategory === category.id
                 ? 'bg-gradient-to-r from-cat-orange to-cat-pink text-white shadow-lg'
