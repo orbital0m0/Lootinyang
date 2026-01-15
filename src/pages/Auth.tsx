@@ -1,7 +1,9 @@
-// 간단화된 인증 헬퍼 - 타입 오류 방지
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '../services/supabase';
 
 export function AuthPage() {
+  const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -9,50 +11,58 @@ export function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // 로그인 처리 - 에러만 처리
+  // 로그인 처리
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
     try {
-      // Simulate API call for testing
-      console.log('로그인 시도:', { email, password });
-      
-      // 테스트용 성공 응답
-      if (email === 'test@example.com' && password === 'password123') {
-        console.log('로그인 성공 - 테스트 모드');
-        window.location.href = '/';
-        return;
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (signInError) throw signInError;
+      if (data.user) {
+        console.log('로그인 성공:', data.user.email);
+        navigate('/');
       }
-      
-      throw new Error('이메일 또는 비밀번호가 올바르지 않습니다.');
     } catch (err: unknown) {
+      console.error('로그인 에러:', err);
       setError(err instanceof Error ? err.message : '로그인에 실패했습니다.');
     } finally {
       setLoading(false);
     }
   };
 
-  // 회원가입 처리 - 에러만 처리
+  // 회원가입 처리
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
     try {
-      // Simulate API call for testing
-      console.log('회원가입 시도:', { email, username, password });
-      
-      // 테스트용 성공 응답
-      if (email && username && password && password.length >= 6) {
-        console.log('회원가입 성공 - 테스트 모드');
-        setError('회원가입이 완료되었습니다. 이메일을 확인해주세요.');
-        return;
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            username: username,
+          },
+        },
+      });
+
+      if (signUpError) throw signUpError;
+
+      if (data.user) {
+        setError('회원가입이 완료되었습니다! 로그인해주세요.');
+        // 회원가입 성공 시 로그인 탭으로 전환
+        setIsLogin(true);
+        setPassword('');
       }
-      
-      throw new Error('입력 정보가 올바르지 않습니다.');
     } catch (err: unknown) {
+      console.error('회원가입 에러:', err);
       setError(err instanceof Error ? err.message : '회원가입에 실패했습니다.');
     } finally {
       setLoading(false);
@@ -198,15 +208,14 @@ export function AuthPage() {
           )}
         </div>
 
-        {/* 데모 계정 정보 */}
-        <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <p className="text-sm font-medium text-yellow-800 mb-2">🧪 데모 계정</p>
-          <p className="text-xs text-yellow-700">
-            테스트용 계정:
-            <br />이메일: test@example.com
-            <br />비밀번호: password123
+        {/* 안내 메시지 */}
+        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <p className="text-sm font-medium text-blue-800 mb-2">💡 시작하기</p>
+          <p className="text-xs text-blue-700">
+            처음이신가요? 회원가입 탭에서 계정을 만들어보세요!
             <br />
-            <br />* 회원가입은 사용자 이름을 포함해야 합니다
+            <br />• 이메일과 비밀번호(최소 6자)만 있으면 바로 시작할 수 있어요
+            <br />• 고양이와 함께 습관을 만들어보세요 🐱
           </p>
         </div>
       </div>
