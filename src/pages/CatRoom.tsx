@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { CuteCatIllustration } from '../components/CuteCatIllustration';
 import { useUser } from '../hooks';
@@ -46,6 +46,7 @@ export function CatRoom() {
 
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [draggedItem, setDraggedItem] = useState<Item | null>(null);
+  const [catReaction, setCatReaction] = useState<'happy' | 'normal'>('normal');
 
   useEffect(() => {
     if (!user) {
@@ -100,6 +101,11 @@ export function CatRoom() {
   const handleRemoveItem = (itemId: string) => {
     if (itemId === 'w1' || itemId === 'f1') return; // 기본 아이템은 제거 불가
     setPlacedItems(prev => prev.filter(i => i.id !== itemId));
+  };
+
+  const handleCatClick = () => {
+    setCatReaction('happy');
+    setTimeout(() => setCatReaction('normal'), 1500);
   };
 
   const filteredItems = items.filter(item => {
@@ -201,18 +207,33 @@ export function CatRoom() {
 
               {/* 고양이 캐릭터 */}
               <motion.div
-                className="absolute"
+                className="absolute cursor-pointer"
                 style={{ bottom: 100, left: '50%', transform: 'translateX(-50%)' }}
                 animate={{
-                  y: [0, -5, 0],
+                  y: catReaction === 'happy' ? [-10, 0, -10] : [0, -5, 0],
+                  rotate: catReaction === 'happy' ? [0, -5, 5, -5, 0] : 0,
                 }}
                 transition={{
-                  duration: 2,
-                  repeat: Infinity,
+                  duration: catReaction === 'happy' ? 0.5 : 2,
+                  repeat: catReaction === 'happy' ? 2 : Infinity,
                   ease: 'easeInOut',
                 }}
+                onClick={handleCatClick}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
               >
                 <CuteCatIllustration size="md" animate={false} />
+                {catReaction === 'happy' && (
+                  <motion.div
+                    className="absolute -top-8 left-1/2 transform -translate-x-1/2 text-2xl"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    💕
+                  </motion.div>
+                )}
               </motion.div>
             </motion.div>
 
@@ -355,6 +376,3 @@ export function CatRoom() {
     </div>
   );
 }
-
-// AnimatePresence를 사용하기 위해 import 추가
-import { AnimatePresence } from 'framer-motion';

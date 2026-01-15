@@ -288,6 +288,21 @@ export function HabitsPage() {
         )}
       </div>
 
+      {/* Floating Action Button */}
+      {habits.length > 0 && !showForm && (
+        <motion.button
+          onClick={() => setShowForm(true)}
+          className="fixed bottom-20 right-6 w-14 h-14 bg-gradient-to-r from-cat-orange to-cat-pink text-white rounded-full shadow-lg flex items-center justify-center text-2xl z-40"
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+        >
+          +
+        </motion.button>
+      )}
+
       {/* 생성/편집 폼 */}
       {showForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 animate-fade-in">

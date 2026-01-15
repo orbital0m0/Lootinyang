@@ -173,12 +173,58 @@ export function Profile() {
               ))}
             </motion.div>
 
-            {/* 주간 통계 */}
+            {/* 최근 업적 */}
             <motion.div
               className="card"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.9 }}
+            >
+              <h3 className="font-semibold mb-3">🏆 최근 업적</h3>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { icon: '🎯', name: '첫 습관', color: 'from-blue-400 to-blue-600' },
+                  { icon: '🔥', name: '7일 연속', color: 'from-orange-400 to-red-500' },
+                  { icon: '⭐', name: '10회 달성', color: 'from-yellow-400 to-amber-500' },
+                ].map((achievement, index) => (
+                  <motion.div
+                    key={achievement.name}
+                    className={`card-achievement bg-gradient-to-br ${achievement.color} text-white`}
+                    initial={{ opacity: 0, scale: 0.5 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 1 + index * 0.1 }}
+                    whileHover={{ scale: 1.1, y: -5 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <div className="text-center">
+                      <motion.div
+                        className="text-2xl mb-1"
+                        animate={{
+                          rotate: [0, -10, 10, 0],
+                          scale: [1, 1.1, 1],
+                        }}
+                        transition={{
+                          duration: 2,
+                          repeat: Infinity,
+                          ease: 'easeInOut',
+                          delay: index * 0.3,
+                        }}
+                      >
+                        {achievement.icon}
+                      </motion.div>
+                      <p className="text-xs font-medium">{achievement.name}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* 주간 통계 */}
+            <motion.div
+              className="card"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.2 }}
             >
               <h3 className="font-semibold mb-3">📈 주간 통계</h3>
               <div className="space-y-3">
@@ -192,7 +238,7 @@ export function Profile() {
                     className="flex justify-between items-center"
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 1 + index * 0.1 }}
+                    transition={{ delay: 1.3 + index * 0.1 }}
                   >
                     <span className="text-sm">{habit.name}</span>
                     <div className="flex items-center space-x-2">
@@ -204,7 +250,7 @@ export function Profile() {
                           className="bg-gradient-to-r from-cat-orange to-cat-pink h-2 rounded-full"
                           initial={{ width: 0 }}
                           animate={{ width: `${habit.progress}%` }}
-                          transition={{ duration: 1, delay: 1.2 + index * 0.1 }}
+                          transition={{ duration: 1, delay: 1.5 + index * 0.1 }}
                         />
                       </motion.div>
                       <span className="text-xs text-gray-500 w-8 text-right">
