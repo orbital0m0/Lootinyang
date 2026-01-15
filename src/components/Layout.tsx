@@ -1,14 +1,9 @@
-import { useLocation } from 'react-router-dom';
+import { useLocation, Outlet } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { useEffect } from 'react';
 
-// 레이아웃 컴포넌트 props 타입
-export interface LayoutProps {
-  children?: React.ReactNode;
-}
-
 // 메인 레이아웃 컴포넌트
-export function Layout({ children }: LayoutProps) {
+export function Layout() {
   const location = useLocation();
 
   // 페이지 접속 시 한번만 강제 새로고침
@@ -61,7 +56,7 @@ export function Layout({ children }: LayoutProps) {
 
       {/* 메인 컨텐츠 */}
       <main className="pb-16">
-        {children}
+        <Outlet />
       </main>
 
       {/* 하단 네비게이션 */}
