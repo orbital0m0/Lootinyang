@@ -1,8 +1,6 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "cleanUrls": true,
-  "trailingSlash": true,
   "headers": [
     {
       "source": "/(.*)",
@@ -14,7 +12,8 @@
       ]
     }
   ],
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+  "routes": [
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/index.html" }
   ]
 }

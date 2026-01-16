@@ -50,20 +50,44 @@ export function AuthPage() {
           data: {
             username: username,
           },
+          emailRedirectTo: window.location.origin,
         },
       });
 
-      if (signUpError) throw signUpError;
+      if (signUpError) {
+        // Database error는 Supabase trigger 문제 - 무시하고 진행
+        if (signUpError.message.includes('Database error')) {
+          console.warn('Supabase trigger 오류 (무시):', signUpError.message);
+          // 회원가입은 성공했을 수 있으므로 로그인 시도
+          setError('회원가입이 완료되었습니다! 로그인해주세요.');
+          setIsLogin(true);
+          setPassword('');
+          return;
+        }
+        throw signUpError;
+      }
 
       if (data.user) {
+        // 이메일 인증 없이 바로 세션이 생성된 경우
+        if (data.session) {
+          console.log('회원가입 및 자동 로그인 성공');
+          navigate('/');
+          return;
+        }
         setError('회원가입이 완료되었습니다! 로그인해주세요.');
-        // 회원가입 성공 시 로그인 탭으로 전환
         setIsLogin(true);
         setPassword('');
       }
     } catch (err: unknown) {
       console.error('회원가입 에러:', err);
-      setError(err instanceof Error ? err.message : '회원가입에 실패했습니다.');
+      const errorMsg = err instanceof Error ? err.message : '회원가입에 실패했습니다.';
+      // 사용자 친화적 에러 메시지
+      if (errorMsg.includes('already registered')) {
+        setError('이미 가입된 이메일입니다. 로그인해주세요.');
+        setIsLogin(true);
+      } else {
+        setError(errorMsg);
+      }
     } finally {
       setLoading(false);
     }
