@@ -1,6 +1,9 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
+  "rewrites": [
+    { "source": "/:path*", "destination": "/index.html" }
+  ],
   "headers": [
     {
       "source": "/(.*)",
@@ -11,9 +14,5 @@
         }
       ]
     }
-  ],
-  "routes": [
-    { "handle": "filesystem" },
-    { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
