@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../services/supabase';
 
 export function AuthPage() {
@@ -10,8 +11,8 @@ export function AuthPage() {
   const [username, setUsername] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
-  // 로그인 처리
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -25,41 +26,34 @@ export function AuthPage() {
 
       if (signInError) throw signInError;
       if (data.user) {
-        console.log('로그인 성공:', data.user.email);
         navigate('/');
       }
     } catch (err: unknown) {
-      console.error('로그인 에러:', err);
       setError(err instanceof Error ? err.message : '로그인에 실패했습니다.');
     } finally {
       setLoading(false);
     }
   };
 
-  // 회원가입 처리
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setSuccess('');
 
     try {
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: {
-            username: username,
-          },
+          data: { username },
           emailRedirectTo: window.location.origin,
         },
       });
 
       if (signUpError) {
-        // Database error는 Supabase trigger 문제 - 무시하고 진행
         if (signUpError.message.includes('Database error')) {
-          console.warn('Supabase trigger 오류 (무시):', signUpError.message);
-          // 회원가입은 성공했을 수 있으므로 로그인 시도
-          setError('회원가입이 완료되었습니다! 로그인해주세요.');
+          setSuccess('회원가입이 완료되었습니다! 로그인해주세요.');
           setIsLogin(true);
           setPassword('');
           return;
@@ -68,20 +62,16 @@ export function AuthPage() {
       }
 
       if (data.user) {
-        // 이메일 인증 없이 바로 세션이 생성된 경우
         if (data.session) {
-          console.log('회원가입 및 자동 로그인 성공');
           navigate('/');
           return;
         }
-        setError('회원가입이 완료되었습니다! 로그인해주세요.');
+        setSuccess('회원가입이 완료되었습니다! 로그인해주세요.');
         setIsLogin(true);
         setPassword('');
       }
     } catch (err: unknown) {
-      console.error('회원가입 에러:', err);
       const errorMsg = err instanceof Error ? err.message : '회원가입에 실패했습니다.';
-      // 사용자 친화적 에러 메시지
       if (errorMsg.includes('already registered')) {
         setError('이미 가입된 이메일입니다. 로그인해주세요.');
         setIsLogin(true);
@@ -94,155 +84,277 @@ export function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-pink-50 flex items-center justify-center p-4">
-      <div className="max-w-md w-full">
+    <div
+      className="min-h-screen flex items-center justify-center p-4"
+      style={{
+        background: 'var(--cozy-cream)',
+        backgroundImage: `
+          radial-gradient(circle at 20% 30%, rgba(232, 168, 124, 0.15) 0%, transparent 50%),
+          radial-gradient(circle at 80% 70%, rgba(156, 175, 136, 0.15) 0%, transparent 50%)
+        `,
+      }}
+    >
+      <motion.div
+        className="max-w-md w-full"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
         {/* 헤더 */}
-        <div className="text-center mb-8">
-          <span className="text-6xl animate-bounce-slow">🐱</span>
-          <h1 className="text-3xl font-bold text-gray-800 mt-4 mb-2">Lootinyang</h1>
-          <p className="text-gray-600">습관 형성을 위한 귀여운 여행</p>
-        </div>
+        <motion.div
+          className="text-center mb-8"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.2 }}
+        >
+          <motion.div
+            className="relative inline-block"
+            animate={{ y: [0, -10, 0] }}
+            transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
+          >
+            <span className="text-7xl block">🐱</span>
+            <motion.span
+              className="absolute -top-2 -right-2 text-2xl"
+              animate={{ rotate: [0, 20, 0], scale: [1, 1.2, 1] }}
+              transition={{ repeat: Infinity, duration: 1.5 }}
+            >
+              ✨
+            </motion.span>
+          </motion.div>
+          <h1 className="font-display text-4xl text-cozy-brown-dark mt-4 mb-2">Lootinyang</h1>
+          <p className="text-cozy-brown font-body">습관 형성을 위한 코지한 여행</p>
+        </motion.div>
 
-        {/* 에러 메시지 */}
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
-            {error}
-          </div>
-        )}
+        {/* 알림 메시지 */}
+        <AnimatePresence mode="wait">
+          {error && (
+            <motion.div
+              className="card-habit mb-4 border-red-300"
+              style={{ background: 'linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%)', borderColor: '#F87171' }}
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+            >
+              <p className="text-red-700 font-body text-sm">{error}</p>
+            </motion.div>
+          )}
+          {success && (
+            <motion.div
+              className="card-habit mb-4"
+              style={{ background: 'linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%)', borderColor: '#34D399' }}
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+            >
+              <p className="text-green-700 font-body text-sm">{success}</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* 탭 */}
-        <div className="flex mb-6">
-          <button
-            className={`flex-1 pb-2 border-b-2 text-sm font-medium transition-colors ${
-              isLogin 
-                ? 'border-primary-500 text-primary-600' 
-                : 'border-transparent text-gray-500 hover:text-gray-700'
+        <motion.div
+          className="flex mb-6 bg-cozy-cream rounded-2xl p-1 border-3 border-cozy-brown-light"
+          style={{ borderWidth: '3px' }}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <motion.button
+            className={`flex-1 py-3 px-4 rounded-xl font-heading font-semibold transition-all ${
+              isLogin
+                ? 'bg-cozy-orange text-white shadow-md'
+                : 'text-cozy-brown hover:bg-cozy-paper'
             }`}
-            onClick={() => setIsLogin(true)}
+            onClick={() => { setIsLogin(true); setError(''); setSuccess(''); }}
+            whileTap={{ scale: 0.98 }}
           >
-            로그인
-          </button>
-          <button
-            className={`flex-1 pb-2 border-b-2 text-sm font-medium transition-colors ${
-              !isLogin 
-                ? 'border-primary-500 text-primary-600' 
-                : 'border-transparent text-gray-500 hover:text-gray-700'
+            <span className="mr-1">🔑</span> 로그인
+          </motion.button>
+          <motion.button
+            className={`flex-1 py-3 px-4 rounded-xl font-heading font-semibold transition-all ${
+              !isLogin
+                ? 'bg-cozy-sage text-white shadow-md'
+                : 'text-cozy-brown hover:bg-cozy-paper'
             }`}
-            onClick={() => setIsLogin(false)}
+            onClick={() => { setIsLogin(false); setError(''); setSuccess(''); }}
+            whileTap={{ scale: 0.98 }}
           >
-            회원가입
-          </button>
-        </div>
+            <span className="mr-1">📝</span> 회원가입
+          </motion.button>
+        </motion.div>
 
         {/* 폼 */}
-        <div className="bg-white rounded-xl shadow-lg p-6">
-          {isLogin ? (
-            /* 로그인 폼 */
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  이메일
-                </label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                  placeholder="이메일을 입력하세요"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  비밀번호
-                </label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                  placeholder="비밀번호를 입력하세요"
-                  required
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full btn-primary"
+        <motion.div
+          className="card"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+        >
+          <AnimatePresence mode="wait">
+            {isLogin ? (
+              <motion.form
+                key="login"
+                onSubmit={handleLogin}
+                className="space-y-5"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
               >
-                {loading ? '로그인 중...' : '로그인'}
-              </button>
-            </form>
-          ) : (
-            /* 회원가입 폼 */
-            <form onSubmit={handleSignUp} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  사용자 이름
-                </label>
-                <input
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                  placeholder="사용자 이름을 입력하세요"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  이메일
-                </label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                  placeholder="이메일을 입력하세요"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  비밀번호
-                </label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                  placeholder="비밀번호를 입력하세요"
-                  required
-                  minLength={6}
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full btn-primary"
+                <div>
+                  <label className="block font-heading font-semibold text-cozy-brown-dark mb-2">
+                    <span className="mr-1">📧</span> 이메일
+                  </label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border-3 border-cozy-brown-light bg-cozy-cream font-body focus:border-cozy-orange focus:outline-none transition-colors"
+                    style={{ borderWidth: '3px' }}
+                    placeholder="이메일을 입력하세요"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block font-heading font-semibold text-cozy-brown-dark mb-2">
+                    <span className="mr-1">🔒</span> 비밀번호
+                  </label>
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border-3 border-cozy-brown-light bg-cozy-cream font-body focus:border-cozy-orange focus:outline-none transition-colors"
+                    style={{ borderWidth: '3px' }}
+                    placeholder="비밀번호를 입력하세요"
+                    required
+                  />
+                </div>
+                <motion.button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full btn-cat text-lg disabled:opacity-60"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  {loading ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <motion.span
+                        animate={{ rotate: 360 }}
+                        transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
+                      >
+                        🐱
+                      </motion.span>
+                      로그인 중...
+                    </span>
+                  ) : (
+                    <>
+                      <span className="mr-2">🚀</span> 로그인
+                    </>
+                  )}
+                </motion.button>
+              </motion.form>
+            ) : (
+              <motion.form
+                key="signup"
+                onSubmit={handleSignUp}
+                className="space-y-5"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
               >
-                {loading ? '가입 중...' : '회원가입'}
-              </button>
-            </form>
-          )}
-        </div>
+                <div>
+                  <label className="block font-heading font-semibold text-cozy-brown-dark mb-2">
+                    <span className="mr-1">👤</span> 닉네임
+                  </label>
+                  <input
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border-3 border-cozy-brown-light bg-cozy-cream font-body focus:border-cozy-sage focus:outline-none transition-colors"
+                    style={{ borderWidth: '3px' }}
+                    placeholder="닉네임을 입력하세요"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block font-heading font-semibold text-cozy-brown-dark mb-2">
+                    <span className="mr-1">📧</span> 이메일
+                  </label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border-3 border-cozy-brown-light bg-cozy-cream font-body focus:border-cozy-sage focus:outline-none transition-colors"
+                    style={{ borderWidth: '3px' }}
+                    placeholder="이메일을 입력하세요"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block font-heading font-semibold text-cozy-brown-dark mb-2">
+                    <span className="mr-1">🔒</span> 비밀번호
+                  </label>
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border-3 border-cozy-brown-light bg-cozy-cream font-body focus:border-cozy-sage focus:outline-none transition-colors"
+                    style={{ borderWidth: '3px' }}
+                    placeholder="비밀번호를 입력하세요 (최소 6자)"
+                    required
+                    minLength={6}
+                  />
+                </div>
+                <motion.button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full btn-primary text-lg disabled:opacity-60"
+                  style={{
+                    background: 'linear-gradient(180deg, var(--cozy-sage-light) 0%, var(--cozy-sage) 100%)',
+                    borderColor: 'var(--cozy-sage-dark)',
+                  }}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  {loading ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <motion.span
+                        animate={{ rotate: 360 }}
+                        transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
+                      >
+                        🐱
+                      </motion.span>
+                      가입 중...
+                    </span>
+                  ) : (
+                    <>
+                      <span className="mr-2">🎉</span> 회원가입
+                    </>
+                  )}
+                </motion.button>
+              </motion.form>
+            )}
+          </AnimatePresence>
+        </motion.div>
 
         {/* 안내 메시지 */}
-        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <p className="text-sm font-medium text-blue-800 mb-2">💡 시작하기</p>
-          <p className="text-xs text-blue-700">
-            처음이신가요? 회원가입 탭에서 계정을 만들어보세요!
-            <br />
-            <br />• 이메일과 비밀번호(최소 6자)만 있으면 바로 시작할 수 있어요
-            <br />• 고양이와 함께 습관을 만들어보세요 🐱
-          </p>
-        </div>
-      </div>
+        <motion.div
+          className="mt-6 card py-4"
+          style={{ background: 'linear-gradient(135deg, var(--cozy-cream) 0%, var(--cozy-orange-light) 50%, var(--cozy-cream) 100%)' }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+        >
+          <div className="flex items-start gap-3">
+            <span className="text-2xl animate-bounce-soft">💡</span>
+            <div>
+              <p className="font-heading font-semibold text-cozy-brown-dark mb-1">시작하기</p>
+              <p className="text-sm text-cozy-brown font-body">
+                처음이신가요? 회원가입하고 고양이와 함께 습관을 만들어보세요! 🐱
+              </p>
+            </div>
+          </div>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }

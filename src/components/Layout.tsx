@@ -1,10 +1,12 @@
-import { useLocation, Outlet } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { useLocation, Outlet, Link } from 'react-router-dom';
 import { useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { useUser } from '../hooks';
 
-// 메인 레이아웃 컴포넌트
+// 메인 레이아웃 컴포넌트 - Cozy Game Style
 export function Layout() {
   const location = useLocation();
+  const { user } = useUser();
 
   // 페이지 접속 시 한번만 강제 새로고침
   useEffect(() => {
@@ -14,66 +16,84 @@ export function Layout() {
     }
   }, []);
 
-  const handleForceRefresh = () => {
-    sessionStorage.removeItem('v2-loaded');
-    window.location.reload();
-  };
-
   const navItems = [
     { path: '/', icon: '🏠', label: '홈' },
-    { path: '/habits', icon: '📊', label: '트래커' },
-    { path: '/cat-room', icon: '🐱', label: '고양이 방' },
+    { path: '/habits', icon: '✅', label: '습관' },
+    { path: '/cat-room', icon: '🐱', label: '고양이방' },
     { path: '/profile', icon: '👤', label: '프로필' },
   ];
 
   return (
-    <div className="mini-app-container">
-      {/* 헤더 */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
+    <div className="mini-app-container safe-area">
+      {/* 헤더 - Cozy Game Style */}
+      <header
+        className="sticky top-0 z-50"
+        style={{
+          background: 'var(--cozy-warm-white)',
+          borderBottom: '4px solid var(--cozy-brown-light)',
+          boxShadow: '0 4px 12px rgba(139, 115, 85, 0.1)',
+        }}
+      >
         <div className="px-4 py-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-               <span className="text-2xl">🐱</span>
-               <h1 className="text-lg font-bold text-gray-800">Lootinyang</h1>
-             </div>
-             <button
-               onClick={handleForceRefresh}
-               className="ml-2 px-3 py-1 text-xs font-medium bg-gradient-to-r from-cat-orange to-cat-pink text-white rounded-full"
-             >
-               🔄
-             </button>
-            <div className="flex items-center space-x-3">
-              <div className="text-sm text-gray-600">
-                Lv.1
+            <Link to="/" className="flex items-center gap-2">
+              <motion.span
+                className="text-3xl"
+                animate={{ rotate: [0, -10, 10, 0] }}
+                transition={{ repeat: Infinity, duration: 3 }}
+              >
+                🐱
+              </motion.span>
+              <h1 className="font-display text-xl text-cozy-brown-dark">Lootinyang</h1>
+            </Link>
+            <div className="flex items-center gap-3">
+              <div className="level-badge text-sm">
+                {user?.level || 1}
               </div>
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cat-orange to-cat-pink flex items-center justify-center shadow-md">
-                <span className="text-white text-sm">🐱</span>
-              </div>
+              <motion.div
+                className="w-10 h-10 rounded-full flex items-center justify-center text-2xl border-3 border-cozy-brown"
+                style={{
+                  background: 'linear-gradient(135deg, var(--cozy-orange-light) 0%, var(--cozy-orange) 100%)',
+                  borderWidth: '3px',
+                  boxShadow: '0 3px 0 var(--cozy-brown-dark)',
+                }}
+                whileHover={{ scale: 1.1, rotate: 5 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                🐱
+              </motion.div>
             </div>
           </div>
         </div>
       </header>
 
       {/* 메인 컨텐츠 */}
-      <main className="pb-16">
+      <main className="pb-24 min-h-screen">
         <Outlet />
       </main>
 
-      {/* 하단 네비게이션 */}
+      {/* 하단 네비게이션 - Cozy Game Style */}
       <nav className="bottom-nav">
-        <div className="flex justify-around py-2">
-          {navItems.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={`nav-item ${
-                location.pathname === item.path ? 'active' : ''
-              }`}
-            >
-              <span className="text-2xl mb-1">{item.icon}</span>
-              <span className="text-xs font-medium">{item.label}</span>
-            </Link>
-          ))}
+        <div className="flex justify-around">
+          {navItems.map((item) => {
+            const isActive = location.pathname === item.path;
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`nav-item ${isActive ? 'active' : ''}`}
+              >
+                <motion.span
+                  className="text-2xl mb-0.5"
+                  animate={isActive ? { scale: [1, 1.2, 1], rotate: [0, -5, 5, 0] } : {}}
+                  transition={{ duration: 0.5 }}
+                >
+                  {item.icon}
+                </motion.span>
+                <span className="text-xs font-heading font-semibold">{item.label}</span>
+              </Link>
+            );
+          })}
         </div>
       </nav>
     </div>

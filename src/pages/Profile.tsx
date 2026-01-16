@@ -2,64 +2,101 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LevelProgressBar } from '../components/LevelProgressBar';
 import { useUser } from '../hooks';
+import { supabase } from '../services/supabase';
+import { useNavigate } from 'react-router-dom';
 
 export function Profile() {
   const { user } = useUser();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'stats' | 'settings'>('stats');
   const [showLevelUp, setShowLevelUp] = useState(false);
 
-  // 샘플 레벨 계산
   const sampleLevel = user?.level || 5;
   const sampleExp = user?.exp || 350;
-  const sampleExpToNext = sampleLevel * 100; // 간단한 계산
+  const sampleExpToNext = sampleLevel * 100;
 
   const handleLevelUp = () => {
     setShowLevelUp(true);
     setTimeout(() => setShowLevelUp(false), 2000);
   };
 
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate('/auth');
+  };
+
   return (
-    <div className="p-4 space-y-4">
-      {/* 페이지 헤더 */}
+    <div className="p-4 pb-24 space-y-5 page-enter">
+      {/* 프로필 헤더 - Cozy Game Style */}
       <motion.div
-        className="text-center"
+        className="card-reward text-center relative overflow-hidden"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
       >
+        {/* 배경 장식 */}
+        <div className="absolute top-2 left-4 text-2xl opacity-30 animate-float">✨</div>
+        <div className="absolute top-4 right-6 text-xl opacity-30 animate-sparkle">⭐</div>
+        <div className="absolute bottom-3 left-8 text-lg opacity-30 animate-wiggle">🌸</div>
+
         <motion.div
-          className="w-20 h-20 mx-auto mb-3 bg-gradient-to-br from-cat-orange to-cat-orange-dark rounded-full flex items-center justify-center text-4xl shadow-lg relative"
+          className="relative w-24 h-24 mx-auto mb-4"
           whileHover={{ scale: 1.05, rotate: 5 }}
           whileTap={{ scale: 0.95 }}
-          transition={{ type: 'spring', stiffness: 400, damping: 17 }}
         >
-          🐱
+          {/* 아바타 프레임 */}
+          <div
+            className="absolute inset-0 rounded-full border-4 border-game-gold"
+            style={{ boxShadow: '0 4px 0 var(--cozy-brown-dark), 0 0 20px rgba(212, 175, 55, 0.3)' }}
+          />
+          <div className="w-full h-full rounded-full bg-gradient-to-br from-cozy-orange-light to-cozy-orange flex items-center justify-center text-5xl">
+            🐱
+          </div>
+          {/* 레벨 배지 */}
+          <div className="level-badge absolute -bottom-1 -right-1 w-10 h-10 text-base">
+            {sampleLevel}
+          </div>
           <AnimatePresence>
             {showLevelUp && (
               <motion.div
-                className="absolute inset-0 bg-yellow-400/50 rounded-full"
-                initial={{ opacity: 0, scale: 0 }}
+                className="absolute inset-0 rounded-full"
+                style={{ background: 'radial-gradient(circle, rgba(212, 175, 55, 0.6) 0%, transparent 70%)' }}
+                initial={{ opacity: 0, scale: 0.5 }}
                 animate={{ opacity: 1, scale: 1.5 }}
                 exit={{ opacity: 0, scale: 2 }}
-                transition={{ duration: 1 }}
               />
             )}
           </AnimatePresence>
         </motion.div>
-        <h2 className="text-xl font-bold">{user?.username || '냥냥이'}</h2>
-        <p className="text-sm text-gray-600">
-          {showLevelUp ? '🎉 레벨업! 🎉' : '경험치 치사각'}
+
+        <h2 className="font-display text-2xl text-cozy-brown-dark mb-1">
+          {user?.username || '냥냥이'}
+        </h2>
+        <p className="text-sm text-cozy-brown font-body">
+          {showLevelUp ? '🎉 레벨업! 🎉' : '습관의 달인을 향해 성장 중!'}
         </p>
+
+        {/* 스트릭 배지 */}
+        <motion.div
+          className="streak-badge mt-4 inline-flex"
+          animate={{ scale: [1, 1.05, 1] }}
+          transition={{ repeat: Infinity, duration: 2 }}
+        >
+          <span>🔥</span>
+          <span>{user?.streak || 7}일 연속</span>
+        </motion.div>
       </motion.div>
 
-      {/* 레벨 정보 */}
+      {/* 레벨 정보 카드 */}
       <motion.div
         className="card"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
+        transition={{ delay: 0.1 }}
       >
-        <h3 className="font-semibold mb-3">📊 레벨 정보</h3>
+        <h3 className="font-display text-lg text-cozy-brown-dark mb-4 flex items-center gap-2">
+          <span className="animate-bounce-soft inline-block">📊</span>
+          레벨 정보
+        </h3>
         <LevelProgressBar
           level={sampleLevel}
           currentExp={sampleExp}
@@ -67,44 +104,47 @@ export function Profile() {
           showLevelUp={showLevelUp}
           size="md"
         />
+        <motion.button
+          onClick={handleLevelUp}
+          className="w-full btn-cat mt-4"
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          <span className="mr-2">🎯</span> 레벨업 테스트
+        </motion.button>
       </motion.div>
 
-      {/* 레벨업 테스트 버튼 */}
-      <motion.button
-        onClick={handleLevelUp}
-        className="w-full py-2 bg-gradient-to-r from-yellow-400 to-amber-500 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-shadow"
-        whileHover={{ scale: 1.02, y: -2 }}
-        whileTap={{ scale: 0.98 }}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-      >
-        🎯 레벨업 테스트
-      </motion.button>
-
       {/* 탭 */}
-      <div className="flex bg-gray-100 rounded-lg p-1">
-        <button
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            activeTab === 'stats' 
-              ? 'bg-white text-primary-500 shadow-sm' 
-              : 'text-gray-600'
-          }`}
+      <motion.div
+        className="flex bg-cozy-cream rounded-2xl p-1 border-3 border-cozy-brown-light"
+        style={{ borderWidth: '3px' }}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+      >
+        <motion.button
           onClick={() => setActiveTab('stats')}
-        >
-          통계
-        </button>
-        <button
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            activeTab === 'settings' 
-              ? 'bg-white text-primary-500 shadow-sm' 
-              : 'text-gray-600'
+          className={`flex-1 py-3 px-4 rounded-xl font-heading font-semibold text-sm transition-all ${
+            activeTab === 'stats'
+              ? 'bg-cozy-lavender text-white shadow-md'
+              : 'text-cozy-brown hover:bg-cozy-paper'
           }`}
-          onClick={() => setActiveTab('settings')}
+          whileTap={{ scale: 0.98 }}
         >
-          설정
-        </button>
-      </div>
+          <span className="mr-1">📈</span> 통계
+        </motion.button>
+        <motion.button
+          onClick={() => setActiveTab('settings')}
+          className={`flex-1 py-3 px-4 rounded-xl font-heading font-semibold text-sm transition-all ${
+            activeTab === 'settings'
+              ? 'bg-cozy-sage text-white shadow-md'
+              : 'text-cozy-brown hover:bg-cozy-paper'
+          }`}
+          whileTap={{ scale: 0.98 }}
+        >
+          <span className="mr-1">⚙️</span> 설정
+        </motion.button>
+      </motion.div>
 
       <AnimatePresence mode="wait">
         {activeTab === 'stats' ? (
@@ -113,62 +153,40 @@ export function Profile() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.3 }}
-            className="space-y-3"
+            transition={{ duration: 0.25 }}
+            className="space-y-4"
           >
             {/* 통계 카드 그리드 */}
             <motion.div
               className="grid grid-cols-2 gap-3"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
+              transition={{ delay: 0.1 }}
             >
               {[
-                { icon: '🔥', value: '7', label: '연속 일수', color: 'text-orange-500' },
-                { icon: '✅', value: '42', label: '전체 체크', color: 'text-green-500' },
-                { icon: '📅', value: '85%', label: '달성률', color: 'text-blue-500' },
-                { icon: '🏆', value: '12', label: '업적', color: 'text-purple-500' },
+                { icon: '🔥', value: user?.streak || 7, label: '연속 일수', bgClass: 'from-orange-400 to-red-400' },
+                { icon: '✅', value: 42, label: '전체 체크', bgClass: 'from-cozy-sage to-green-500' },
+                { icon: '📅', value: '85%', label: '달성률', bgClass: 'from-game-exp to-blue-400' },
+                { icon: '🏆', value: 12, label: '업적', bgClass: 'from-cozy-lavender to-purple-500' },
               ].map((stat, index) => (
                 <motion.div
                   key={stat.label}
-                  className="card-achievement"
+                  className="stat-box relative overflow-hidden"
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.5 + index * 0.1 }}
-                  whileHover={{ scale: 1.05, y: -5 }}
+                  transition={{ delay: 0.15 + index * 0.08 }}
+                  whileHover={{ scale: 1.05, y: -4 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <div className="text-center">
-                    <motion.div
-                      className="text-2xl mb-1"
-                      animate={{
-                        rotate: [0, 10, -10, 0],
-                      }}
-                      transition={{
-                        duration: 2,
-                        repeat: Infinity,
-                        ease: 'easeInOut',
-                        delay: index * 0.2,
-                      }}
-                    >
-                      {stat.icon}
-                    </motion.div>
-                    <motion.p
-                      className={`text-2xl font-bold ${stat.color}`}
-                      animate={{
-                        scale: [1, 1.1, 1],
-                      }}
-                      transition={{
-                        duration: 2,
-                        repeat: Infinity,
-                        ease: 'easeInOut',
-                        delay: index * 0.2,
-                      }}
-                    >
-                      {stat.value}
-                    </motion.p>
-                    <p className="text-xs text-gray-600">{stat.label}</p>
-                  </div>
+                  <motion.div
+                    className="text-3xl mb-2"
+                    animate={{ rotate: [0, 10, -10, 0] }}
+                    transition={{ duration: 2, repeat: Infinity, delay: index * 0.2 }}
+                  >
+                    {stat.icon}
+                  </motion.div>
+                  <div className="stat-value">{stat.value}</div>
+                  <div className="stat-label">{stat.label}</div>
                 </motion.div>
               ))}
             </motion.div>
@@ -178,42 +196,37 @@ export function Profile() {
               className="card"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.9 }}
+              transition={{ delay: 0.4 }}
             >
-              <h3 className="font-semibold mb-3">🏆 최근 업적</h3>
-              <div className="grid grid-cols-3 gap-2">
+              <h3 className="font-display text-lg text-cozy-brown-dark mb-4 flex items-center gap-2">
+                <span className="animate-sparkle inline-block">🏆</span>
+                최근 업적
+              </h3>
+              <div className="grid grid-cols-3 gap-3">
                 {[
-                  { icon: '🎯', name: '첫 습관', color: 'from-blue-400 to-blue-600' },
-                  { icon: '🔥', name: '7일 연속', color: 'from-orange-400 to-red-500' },
-                  { icon: '⭐', name: '10회 달성', color: 'from-yellow-400 to-amber-500' },
+                  { icon: '🎯', name: '첫 습관', color: 'bg-game-exp' },
+                  { icon: '🔥', name: '7일 연속', color: 'bg-cozy-orange' },
+                  { icon: '⭐', name: '10회 달성', color: 'bg-game-gold' },
                 ].map((achievement, index) => (
                   <motion.div
                     key={achievement.name}
-                    className={`card-achievement bg-gradient-to-br ${achievement.color} text-white`}
+                    className={`card-achievement ${achievement.color} p-3`}
                     initial={{ opacity: 0, scale: 0.5 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 1 + index * 0.1 }}
-                    whileHover={{ scale: 1.1, y: -5 }}
+                    transition={{ delay: 0.5 + index * 0.1 }}
+                    whileHover={{ scale: 1.1, y: -4, rotate: 2 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    <div className="text-center">
-                      <motion.div
-                        className="text-2xl mb-1"
-                        animate={{
-                          rotate: [0, -10, 10, 0],
-                          scale: [1, 1.1, 1],
-                        }}
-                        transition={{
-                          duration: 2,
-                          repeat: Infinity,
-                          ease: 'easeInOut',
-                          delay: index * 0.3,
-                        }}
-                      >
-                        {achievement.icon}
-                      </motion.div>
-                      <p className="text-xs font-medium">{achievement.name}</p>
-                    </div>
+                    <motion.div
+                      className="text-2xl mb-1"
+                      animate={{ rotate: [0, -10, 10, 0], scale: [1, 1.1, 1] }}
+                      transition={{ duration: 2, repeat: Infinity, delay: index * 0.3 }}
+                    >
+                      {achievement.icon}
+                    </motion.div>
+                    <p className="text-xs font-heading font-semibold text-cozy-brown-dark">
+                      {achievement.name}
+                    </p>
                   </motion.div>
                 ))}
               </div>
@@ -224,38 +237,41 @@ export function Profile() {
               className="card"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.2 }}
+              transition={{ delay: 0.6 }}
             >
-              <h3 className="font-semibold mb-3">📈 주간 통계</h3>
-              <div className="space-y-3">
+              <h3 className="font-display text-lg text-cozy-brown-dark mb-4 flex items-center gap-2">
+                <span>📈</span>
+                주간 통계
+              </h3>
+              <div className="space-y-4">
                 {[
-                  { name: '운동하기', progress: 66, completed: 2 },
-                  { name: '독서하기', progress: 80, completed: 4 },
-                  { name: '명상하기', progress: 40, completed: 2 },
+                  { name: '운동하기', icon: '💪', progress: 66, completed: 2, target: 3 },
+                  { name: '독서하기', icon: '📚', progress: 80, completed: 4, target: 5 },
+                  { name: '명상하기', icon: '🧘', progress: 40, completed: 2, target: 5 },
                 ].map((habit, index) => (
                   <motion.div
                     key={habit.name}
-                    className="flex justify-between items-center"
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 1.3 + index * 0.1 }}
+                    transition={{ delay: 0.7 + index * 0.1 }}
                   >
-                    <span className="text-sm">{habit.name}</span>
-                    <div className="flex items-center space-x-2">
-                      <motion.div
-                        className="w-24 bg-gray-200 rounded-full h-2 overflow-hidden"
-                        whileHover={{ scale: 1.05 }}
-                      >
-                        <motion.div
-                          className="bg-gradient-to-r from-cat-orange to-cat-pink h-2 rounded-full"
-                          initial={{ width: 0 }}
-                          animate={{ width: `${habit.progress}%` }}
-                          transition={{ duration: 1, delay: 1.5 + index * 0.1 }}
-                        />
-                      </motion.div>
-                      <span className="text-xs text-gray-500 w-8 text-right">
-                        {habit.completed}/3
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="font-heading font-semibold text-cozy-brown-dark flex items-center gap-2">
+                        <span>{habit.icon}</span> {habit.name}
                       </span>
+                      <div className="flex items-center gap-1 bg-cozy-cream px-2 py-1 rounded-full border-2 border-cozy-brown-light text-sm">
+                        <span className="font-display text-cozy-brown-dark">{habit.completed}</span>
+                        <span className="text-cozy-brown-light">/</span>
+                        <span className="font-display text-cozy-brown">{habit.target}</span>
+                      </div>
+                    </div>
+                    <div className="progress-bar progress-bar-cat h-4">
+                      <motion.div
+                        className="progress-fill progress-fill-cat"
+                        initial={{ width: 0 }}
+                        animate={{ width: `${habit.progress}%` }}
+                        transition={{ duration: 0.8, delay: 0.8 + index * 0.1 }}
+                      />
                     </div>
                   </motion.div>
                 ))}
@@ -263,148 +279,170 @@ export function Profile() {
             </motion.div>
           </motion.div>
         ) : (
-        /* 설정 탭 */
-        <motion.div
-          key="settings"
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -20 }}
-          transition={{ duration: 0.3 }}
-          className="space-y-3"
-        >
-          {/* 알림 설정 */}
           <motion.div
-            className="card"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
+            key="settings"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.25 }}
+            className="space-y-4"
           >
-            <h3 className="font-semibold mb-3">⚙️ 알림 설정</h3>
-            <div className="space-y-3">
-              {[
-                { name: '습관 리마인더', description: '매일 9시 알림', enabled: true },
-                { name: '보상 알림', description: '상자 획득 시 알림', enabled: false },
-              ].map((item, index) => (
-                <motion.div
-                  key={item.name}
-                  className="flex items-center justify-between"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.5 + index * 0.1 }}
-                >
-                  <div>
-                    <p className="font-medium text-sm">{item.name}</p>
-                    <p className="text-xs text-gray-500">{item.description}</p>
-                  </div>
-                  <motion.button
-                    className={`w-12 h-6 rounded-full relative transition-colors ${
-                      item.enabled ? 'bg-primary-500' : 'bg-gray-300'
-                    }`}
-                    whileTap={{ scale: 0.9 }}
-                  >
-                    <motion.span
-                      className="absolute top-1 w-4 h-4 bg-white rounded-full shadow-sm"
-                      initial={false}
-                      animate={{
-                        left: item.enabled ? 'calc(100% - 20px)' : '4px',
-                      }}
-                      transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                    />
-                  </motion.button>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* 테마 설정 */}
-          <motion.div
-            className="card"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}
-          >
-            <h3 className="font-semibold mb-3">🎨 테마 설정</h3>
-            <div className="grid grid-cols-4 gap-2">
-              {[
-                { name: '기본', color: 'bg-primary-500' },
-                { name: '오렌지', color: 'bg-cat-orange' },
-                { name: '보라', color: 'bg-cat-purple' },
-                { name: '핑크', color: 'bg-cat-pink' },
-              ].map((theme, index) => (
-                <motion.button
-                  key={theme.name}
-                  className={`p-3 rounded-lg border-2 transition-all ${
-                    index === 0 ? 'border-primary-500' : 'border-gray-200'
-                  }`}
-                  whileHover={{ scale: 1.05, y: -3 }}
-                  whileTap={{ scale: 0.95 }}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.8 + index * 0.1 }}
-                >
+            {/* 알림 설정 */}
+            <motion.div
+              className="card"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+            >
+              <h3 className="font-display text-lg text-cozy-brown-dark mb-4 flex items-center gap-2">
+                <span>🔔</span> 알림 설정
+              </h3>
+              <div className="space-y-4">
+                {[
+                  { name: '습관 리마인더', description: '매일 9시 알림', enabled: true },
+                  { name: '보상 알림', description: '상자 획득 시 알림', enabled: false },
+                ].map((item, index) => (
                   <motion.div
-                    className={`w-8 h-8 rounded-full ${theme.color} mx-auto mb-1`}
-                    animate={{
-                      scale: [1, 1.1, 1],
-                      rotate: [0, 5, -5, 0],
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      ease: 'easeInOut',
-                      delay: index * 0.2,
-                    }}
-                  />
-                  <p className="text-xs">{theme.name}</p>
-                </motion.button>
-              ))}
-            </div>
-          </motion.div>
+                    key={item.name}
+                    className="flex items-center justify-between p-3 bg-cozy-cream rounded-xl border-2 border-cozy-brown-light"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.15 + index * 0.08 }}
+                  >
+                    <div>
+                      <p className="font-heading font-semibold text-cozy-brown-dark">{item.name}</p>
+                      <p className="text-xs text-cozy-brown font-body">{item.description}</p>
+                    </div>
+                    <motion.button
+                      className={`w-14 h-8 rounded-full relative transition-colors border-3 ${
+                        item.enabled
+                          ? 'bg-cozy-sage border-cozy-sage-dark'
+                          : 'bg-cozy-brown-light border-cozy-brown'
+                      }`}
+                      style={{ borderWidth: '3px' }}
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      <motion.span
+                        className="absolute top-0.5 w-6 h-6 bg-white rounded-full shadow-md"
+                        initial={false}
+                        animate={{ left: item.enabled ? 'calc(100% - 26px)' : '2px' }}
+                        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                      />
+                    </motion.button>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
 
-          {/* 계정 설정 */}
-          <motion.div
-            className="card"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.2 }}
-          >
-            <h3 className="font-semibold mb-3">🔐 계정</h3>
-            <div className="space-y-2">
-              {[
-                { icon: '📧', label: '이메일 변경', color: 'text-gray-700' },
-                { icon: '🔒', label: '비밀번호 변경', color: 'text-gray-700' },
-                { icon: '🚪', label: '로그아웃', color: 'text-red-500' },
-              ].map((item, index) => (
+            {/* 테마 설정 */}
+            <motion.div
+              className="card"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              <h3 className="font-display text-lg text-cozy-brown-dark mb-4 flex items-center gap-2">
+                <span className="animate-wiggle inline-block">🎨</span> 테마 설정
+              </h3>
+              <div className="grid grid-cols-4 gap-3">
+                {[
+                  { name: '기본', color: 'bg-cozy-orange', active: true },
+                  { name: '민트', color: 'bg-cozy-sage', active: false },
+                  { name: '라벤더', color: 'bg-cozy-lavender', active: false },
+                  { name: '로즈', color: 'bg-cozy-rose', active: false },
+                ].map((theme, index) => (
+                  <motion.button
+                    key={theme.name}
+                    className={`p-3 rounded-xl transition-all border-3 ${
+                      theme.active
+                        ? 'bg-cozy-paper border-cozy-orange shadow-md'
+                        : 'bg-cozy-cream border-cozy-brown-light'
+                    }`}
+                    style={{ borderWidth: '3px' }}
+                    whileHover={{ scale: 1.08, y: -3 }}
+                    whileTap={{ scale: 0.95 }}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.35 + index * 0.08 }}
+                  >
+                    <motion.div
+                      className={`w-10 h-10 rounded-full ${theme.color} mx-auto mb-2 border-3 border-cozy-brown`}
+                      style={{ borderWidth: '3px', boxShadow: '0 2px 0 var(--cozy-brown-dark)' }}
+                      animate={theme.active ? { scale: [1, 1.1, 1], rotate: [0, 5, -5, 0] } : {}}
+                      transition={{ duration: 2, repeat: Infinity, delay: index * 0.2 }}
+                    />
+                    <p className="text-xs font-heading font-semibold text-cozy-brown-dark">{theme.name}</p>
+                    {theme.active && <span className="text-xs">✓</span>}
+                  </motion.button>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* 계정 설정 */}
+            <motion.div
+              className="card"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              <h3 className="font-display text-lg text-cozy-brown-dark mb-4 flex items-center gap-2">
+                <span>🔐</span> 계정
+              </h3>
+              <div className="space-y-3">
+                {[
+                  { icon: '📧', label: '이메일 변경', danger: false },
+                  { icon: '🔒', label: '비밀번호 변경', danger: false },
+                ].map((item, index) => (
+                  <motion.button
+                    key={item.label}
+                    className="w-full btn-secondary text-left flex items-center gap-3"
+                    whileHover={{ scale: 1.02, x: 4 }}
+                    whileTap={{ scale: 0.98 }}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.55 + index * 0.08 }}
+                  >
+                    <span className="text-xl">{item.icon}</span>
+                    <span className="font-heading font-semibold">{item.label}</span>
+                  </motion.button>
+                ))}
                 <motion.button
-                  key={item.label}
-                  className="w-full btn-secondary text-left"
-                  whileHover={{ scale: 1.02, x: 5 }}
-                  whileTap={{ scale: 0.98 }}
+                  onClick={handleLogout}
+                  className="w-full py-4 px-6 rounded-xl font-heading font-semibold text-white flex items-center justify-center gap-3 border-3"
+                  style={{
+                    background: 'linear-gradient(180deg, #E57373 0%, #D32F2F 100%)',
+                    borderWidth: '3px',
+                    borderColor: '#B71C1C',
+                    boxShadow: '0 4px 0 #7F0000',
+                  }}
+                  whileHover={{ scale: 1.02, y: -2 }}
+                  whileTap={{ scale: 0.98, y: 2 }}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 1.3 + index * 0.1 }}
+                  transition={{ delay: 0.7 }}
                 >
-                  <span className={item.color}>
-                    {item.icon} {item.label}
-                  </span>
+                  <span className="text-xl">🚪</span>
+                  <span>로그아웃</span>
                 </motion.button>
-              ))}
-            </div>
+              </div>
+            </motion.div>
           </motion.div>
-        </motion.div>
-       )}
+        )}
       </AnimatePresence>
 
-      {/* 링크 */}
+      {/* 푸터 링크 */}
       <motion.div
-        className="text-center space-y-2 mt-6"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.5 }}
+        className="text-center py-4"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.8 }}
       >
-        <button className="text-sm text-gray-500">개인정보처리방침</button>
-        <span className="text-gray-300">•</span>
-        <button className="text-sm text-gray-500">이용약관</button>
+        <div className="flex items-center justify-center gap-4 text-sm text-cozy-brown font-body">
+          <button className="hover:text-cozy-brown-dark transition-colors">개인정보처리방침</button>
+          <span className="text-cozy-brown-light">•</span>
+          <button className="hover:text-cozy-brown-dark transition-colors">이용약관</button>
+        </div>
+        <p className="text-xs text-cozy-brown-light mt-2">Lootinyang v1.0.0</p>
       </motion.div>
     </div>
   );
