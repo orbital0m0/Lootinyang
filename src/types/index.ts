@@ -1,10 +1,13 @@
 // 기본 타입 정의
 export interface User {
   id: string;
+  auth_id?: string;
   username: string;
+  email?: string;
   level: number;
   exp: number;
-  totalHabits: number;
+  totalHabits?: number;
+  total_habits?: number;
   streak: number;
   created_at: string;
   updated_at: string;

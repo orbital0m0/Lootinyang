@@ -17,22 +17,40 @@ export function useUser(): UseUserReturn {
       try {
         const authUser = await supabaseHelpers.getCurrentUser();
         if (!authUser) return null;
-        
-        // Supabase auth 사용자 정보로 DB 사용자 정보 조회
-        const { data: userData, error: userError } = await supabase
-          .from('users')
-          .select('*')
-          .eq('auth_id', authUser.id)
-          .single();
-        
-        if (userError || !userData) {
-          // 사용자 정보가 없으면 기본값으로 생성
+
+        // 기본 사용자 정보 (auth 정보 기반)
+        const defaultUser: User = {
+          id: authUser.id,
+          auth_id: authUser.id,
+          username: authUser.user_metadata?.username || authUser.email?.split('@')[0] || 'user',
+          email: authUser.email || '',
+          level: 1,
+          exp: 0,
+          streak: 0,
+          total_habits: 0,
+          created_at: authUser.created_at || new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+
+        // Supabase auth 사용자 정보로 DB 사용자 정보 조회 시도
+        try {
+          const { data: userData, error: userError } = await supabase
+            .from('users')
+            .select('*')
+            .eq('auth_id', authUser.id)
+            .single();
+
+          if (!userError && userData) {
+            return userData;
+          }
+
+          // DB에 사용자 정보가 없으면 생성 시도
           const { data: newUser, error: insertError } = await supabase
             .from('users')
             .insert({
               auth_id: authUser.id,
-              username: authUser.email?.split('@')[0] || 'user',
-              email: authUser.email || '',
+              username: defaultUser.username,
+              email: defaultUser.email,
               level: 1,
               exp: 0,
               streak: 0,
@@ -40,16 +58,19 @@ export function useUser(): UseUserReturn {
             })
             .select()
             .single();
-          
-          if (insertError) {
-            console.error('사용자 생성 실패:', insertError);
-            return null;
+
+          if (!insertError && newUser) {
+            return newUser;
           }
-          
-          return newUser;
+
+          // DB 오류 시에도 기본 사용자 정보 반환 (앱은 계속 동작)
+          console.warn('DB 사용자 생성 실패, 기본 정보 사용:', insertError?.message);
+          return defaultUser;
+        } catch (dbError) {
+          // DB 연결 실패 시에도 기본 사용자 정보 반환
+          console.warn('DB 연결 실패, 기본 정보 사용:', dbError);
+          return defaultUser;
         }
-        
-        return userData;
       } catch (error) {
         console.error('사용자 정보 조회 실패:', error);
         return null;
