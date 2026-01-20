@@ -73,7 +73,7 @@ export function HabitCard({
                       opacity: 0,
                       scale: 1.5,
                       y: -50 - i * 10,
-                      x: (Math.random() - 0.5) * 50,
+                      x: (i - 2) * 20,
                     }}
                     transition={{
                       duration: 1,

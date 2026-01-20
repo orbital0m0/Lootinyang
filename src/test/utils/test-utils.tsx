@@ -1,10 +1,11 @@
+/* eslint-disable react-refresh/only-export-components */
 import type { ReactElement, ReactNode } from 'react';
-import { render, type RenderOptions } from '@testing-library/react';
+import { render as rtlRender, type RenderOptions } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, MemoryRouter } from 'react-router-dom';
 
 // Create a new QueryClient for each test
-const createTestQueryClient = () =>
+export const createTestQueryClient = () =>
   new QueryClient({
     defaultOptions: {
       queries: {
@@ -24,7 +25,6 @@ interface WrapperProps {
 
 interface CustomRenderOptions extends Omit<RenderOptions, 'wrapper'> {
   initialEntries?: string[];
-  route?: string;
 }
 
 // All providers wrapper
@@ -52,19 +52,19 @@ function createMemoryRouterWrapper(initialEntries: string[] = ['/']) {
 }
 
 // Custom render function
-function customRender(
+export function render(
   ui: ReactElement,
-  { initialEntries, route, ...options }: CustomRenderOptions = {}
+  { initialEntries, ...options }: CustomRenderOptions = {}
 ) {
   const Wrapper = initialEntries
     ? createMemoryRouterWrapper(initialEntries)
     : AllProviders;
 
-  return render(ui, { wrapper: Wrapper, ...options });
+  return rtlRender(ui, { wrapper: Wrapper, ...options });
 }
 
 // Render with QueryClient only (no router)
-function renderWithQueryClient(ui: ReactElement, options?: Omit<RenderOptions, 'wrapper'>) {
+export function renderWithQueryClient(ui: ReactElement, options?: Omit<RenderOptions, 'wrapper'>) {
   const queryClient = createTestQueryClient();
 
   function QueryWrapper({ children }: WrapperProps) {
@@ -72,14 +72,17 @@ function renderWithQueryClient(ui: ReactElement, options?: Omit<RenderOptions, '
   }
 
   return {
-    ...render(ui, { wrapper: QueryWrapper, ...options }),
+    ...rtlRender(ui, { wrapper: QueryWrapper, ...options }),
     queryClient,
   };
 }
 
-// Re-export everything
-export * from '@testing-library/react';
+// Re-export specific items from testing-library (not using export *)
+export {
+  screen,
+  fireEvent,
+  waitFor,
+  within,
+  cleanup,
+} from '@testing-library/react';
 export { default as userEvent } from '@testing-library/user-event';
-
-// Export custom renders
-export { customRender as render, renderWithQueryClient, createTestQueryClient };

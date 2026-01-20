@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push)",
+      "Bash(npm run lint)",
+      "Bash(npm audit fix:*)",
+      "Bash(npm audit:*)",
+      "Bash(vercel whoami:*)",
+      "Bash(vercel ls:*)",
+      "Bash(vercel:*)",
+      "Bash(timeout 60 bash:*)",
+      "Bash(npm run build:*)",
+      "Skill(vs-design-diverge)",
+      "Bash(git push:*)",
+      "Bash(npx add-skill:*)",
+      "Bash(pnpm validate:*)",
+      "Bash(wc:*)",
+      "Bash(find:*)",
+      "Bash(npm test:*)",
+      "Bash(npx vercel --version)",
+      "Bash(npx vercel:*)"
+    ]
+  }
+}

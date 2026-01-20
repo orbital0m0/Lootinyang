@@ -142,8 +142,9 @@ export function HabitsPage() {
         </motion.button>
       )}
 
-      {/* Create/Edit Form Modal */}
+      {/* Create/Edit Form Modal - key forces remount when switching habits */}
       <HabitForm
+        key={editingHabit?.id ?? 'new'}
         isOpen={showForm}
         editingHabit={editingHabit}
         isCreating={isCreating}

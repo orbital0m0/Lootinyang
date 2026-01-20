@@ -20,31 +20,20 @@ export function HabitForm({
   onSubmit,
   onUpdate,
 }: HabitFormProps) {
-  const [name, setName] = useState('');
-  const [weeklyTarget, setWeeklyTarget] = useState(3);
-  const modalRef = useRef<HTMLDivElement>(null);
+  // Initialize state from props - component will remount via key when editingHabit changes
+  const [name, setName] = useState(editingHabit?.name ?? '');
+  const [weeklyTarget, setWeeklyTarget] = useState(editingHabit?.weekly_target ?? 3);
   const firstInputRef = useRef<HTMLInputElement>(null);
   const previousActiveElement = useRef<HTMLElement | null>(null);
 
-  // Sync form state when editing habit changes
-  useEffect(() => {
-    if (editingHabit) {
-      setName(editingHabit.name);
-      setWeeklyTarget(editingHabit.weekly_target);
-    } else {
-      setName('');
-      setWeeklyTarget(3);
-    }
-  }, [editingHabit]);
-
-  // Focus management and trap
+  // Focus management
   useEffect(() => {
     if (isOpen) {
       previousActiveElement.current = document.activeElement as HTMLElement;
-      // Delay focus to allow animation to complete
-      setTimeout(() => {
+      const timeoutId = setTimeout(() => {
         firstInputRef.current?.focus();
       }, 100);
+      return () => clearTimeout(timeoutId);
     } else if (previousActiveElement.current) {
       previousActiveElement.current.focus();
     }
@@ -87,7 +76,6 @@ export function HabitForm({
       role="presentation"
     >
       <div
-        ref={modalRef}
         className="card max-w-md w-full"
         role="dialog"
         aria-modal="true"
