@@ -10,6 +10,8 @@ import { Achievements } from './pages/Achievements';
 import { CatRoom } from './pages/CatRoom';
 import { DatabaseTest } from './pages/DatabaseTest';
 import { AuthPage } from './pages/Auth';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import { ErrorFallback } from './components/ErrorFallback';
 
 // 페이지 전환 애니메이션 래퍼 컴포넌트
 function PageTransition({ children }: { children: React.ReactNode }) {
@@ -44,12 +46,23 @@ const queryClient = new QueryClient({
   },
 });
 
+// 라우터 에러 폴백 컴포넌트
+function RouterErrorFallback() {
+  return (
+    <ErrorFallback
+      error={new Error('페이지를 찾을 수 없습니다.')}
+      resetError={() => window.location.href = '/'}
+      type="page"
+    />
+  );
+}
+
 // 라우터 설정
 const router = createBrowserRouter([
   {
     path: '/',
     element: <Layout />,
-    errorElement: <div className="text-center p-8">페이지를 찾을 수 없습니다.</div>,
+    errorElement: <RouterErrorFallback />,
     children: [
       {
         index: true,
@@ -84,18 +97,20 @@ const router = createBrowserRouter([
   {
     path: '/auth',
     element: <PageTransition><AuthPage /></PageTransition>,
-    errorElement: <div className="text-center p-8">인증 오류가 발생했습니다.</div>,
+    errorElement: <RouterErrorFallback />,
   },
 ]);
 
 // 앱 루트 컴포넌트
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <div className="min-h-screen bg-gray-50">
-        <RouterProvider router={router} />
-      </div>
-    </QueryClientProvider>
+    <ErrorBoundary type="app">
+      <QueryClientProvider client={queryClient}>
+        <div className="min-h-screen bg-gray-50">
+          <RouterProvider router={router} />
+        </div>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 

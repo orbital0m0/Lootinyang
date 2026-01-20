@@ -134,6 +134,8 @@ export function AuthPage() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
+              role="alert"
+              aria-live="assertive"
             >
               <p className="text-red-700 font-body text-sm">{error}</p>
             </motion.div>
@@ -145,6 +147,8 @@ export function AuthPage() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
+              role="status"
+              aria-live="polite"
             >
               <p className="text-green-700 font-body text-sm">{success}</p>
             </motion.div>
@@ -199,12 +203,14 @@ export function AuthPage() {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 20 }}
+                aria-label="로그인 폼"
               >
                 <div>
-                  <label className="block font-heading font-semibold text-cozy-brown-dark mb-2">
-                    <span className="mr-1">📧</span> 이메일
+                  <label htmlFor="login-email" className="block font-heading font-semibold text-cozy-brown-dark mb-2">
+                    <span className="mr-1" aria-hidden="true">📧</span> 이메일
                   </label>
                   <input
+                    id="login-email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -212,13 +218,16 @@ export function AuthPage() {
                     style={{ borderWidth: '3px' }}
                     placeholder="이메일을 입력하세요"
                     required
+                    aria-required="true"
+                    autoComplete="email"
                   />
                 </div>
                 <div>
-                  <label className="block font-heading font-semibold text-cozy-brown-dark mb-2">
-                    <span className="mr-1">🔒</span> 비밀번호
+                  <label htmlFor="login-password" className="block font-heading font-semibold text-cozy-brown-dark mb-2">
+                    <span className="mr-1" aria-hidden="true">🔒</span> 비밀번호
                   </label>
                   <input
+                    id="login-password"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -226,6 +235,8 @@ export function AuthPage() {
                     style={{ borderWidth: '3px' }}
                     placeholder="비밀번호를 입력하세요"
                     required
+                    aria-required="true"
+                    autoComplete="current-password"
                   />
                 </div>
                 <motion.button
@@ -260,12 +271,14 @@ export function AuthPage() {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
+                aria-label="회원가입 폼"
               >
                 <div>
-                  <label className="block font-heading font-semibold text-cozy-brown-dark mb-2">
-                    <span className="mr-1">👤</span> 닉네임
+                  <label htmlFor="signup-username" className="block font-heading font-semibold text-cozy-brown-dark mb-2">
+                    <span className="mr-1" aria-hidden="true">👤</span> 닉네임
                   </label>
                   <input
+                    id="signup-username"
                     type="text"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
@@ -273,13 +286,16 @@ export function AuthPage() {
                     style={{ borderWidth: '3px' }}
                     placeholder="닉네임을 입력하세요"
                     required
+                    aria-required="true"
+                    autoComplete="username"
                   />
                 </div>
                 <div>
-                  <label className="block font-heading font-semibold text-cozy-brown-dark mb-2">
-                    <span className="mr-1">📧</span> 이메일
+                  <label htmlFor="signup-email" className="block font-heading font-semibold text-cozy-brown-dark mb-2">
+                    <span className="mr-1" aria-hidden="true">📧</span> 이메일
                   </label>
                   <input
+                    id="signup-email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -287,13 +303,16 @@ export function AuthPage() {
                     style={{ borderWidth: '3px' }}
                     placeholder="이메일을 입력하세요"
                     required
+                    aria-required="true"
+                    autoComplete="email"
                   />
                 </div>
                 <div>
-                  <label className="block font-heading font-semibold text-cozy-brown-dark mb-2">
-                    <span className="mr-1">🔒</span> 비밀번호
+                  <label htmlFor="signup-password" className="block font-heading font-semibold text-cozy-brown-dark mb-2">
+                    <span className="mr-1" aria-hidden="true">🔒</span> 비밀번호
                   </label>
                   <input
+                    id="signup-password"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -301,8 +320,12 @@ export function AuthPage() {
                     style={{ borderWidth: '3px' }}
                     placeholder="비밀번호를 입력하세요 (최소 6자)"
                     required
+                    aria-required="true"
+                    aria-describedby="password-hint"
+                    autoComplete="new-password"
                     minLength={6}
                   />
+                  <p id="password-hint" className="sr-only">비밀번호는 최소 6자 이상이어야 합니다</p>
                 </div>
                 <motion.button
                   type="submit"

@@ -2,6 +2,7 @@ import { useLocation, Outlet, Link } from 'react-router-dom';
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useUser } from '../hooks';
+import { ErrorBoundary } from './ErrorBoundary';
 
 // 메인 레이아웃 컴포넌트 - Cozy Game Style
 export function Layout() {
@@ -69,12 +70,14 @@ export function Layout() {
 
       {/* 메인 컨텐츠 */}
       <main className="pb-24 min-h-screen">
-        <Outlet />
+        <ErrorBoundary type="page">
+          <Outlet />
+        </ErrorBoundary>
       </main>
 
       {/* 하단 네비게이션 - Cozy Game Style */}
-      <nav className="bottom-nav">
-        <div className="flex justify-around">
+      <nav className="bottom-nav" aria-label="메인 네비게이션">
+        <div className="flex justify-around" role="list">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
             return (
@@ -82,11 +85,15 @@ export function Layout() {
                 key={item.path}
                 to={item.path}
                 className={`nav-item ${isActive ? 'active' : ''}`}
+                aria-current={isActive ? 'page' : undefined}
+                aria-label={`${item.label} ${isActive ? '(현재 페이지)' : ''}`}
+                role="listitem"
               >
                 <motion.span
                   className="text-2xl mb-0.5"
                   animate={isActive ? { scale: [1, 1.2, 1], rotate: [0, -5, 5, 0] } : {}}
                   transition={{ duration: 0.5 }}
+                  aria-hidden="true"
                 >
                   {item.icon}
                 </motion.span>

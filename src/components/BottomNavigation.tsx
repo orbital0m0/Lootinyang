@@ -13,8 +13,8 @@ export function BottomNavigation() {
   ];
 
   return (
-    <nav className="bottom-nav">
-      <div className="flex justify-around">
+    <nav className="bottom-nav" aria-label="메인 네비게이션">
+      <div className="flex justify-around" role="list">
         {navItems.map((item) => {
           const isActive = location.pathname === item.path;
 
@@ -25,6 +25,9 @@ export function BottomNavigation() {
               className={`nav-item ${isActive ? 'active' : ''}`}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              aria-current={isActive ? 'page' : undefined}
+              aria-label={`${item.label} ${isActive ? '(현재 페이지)' : ''}`}
+              role="listitem"
             >
               <motion.div
                 animate={{
@@ -32,7 +35,7 @@ export function BottomNavigation() {
                 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 17 }}
               >
-                <span className="text-2xl mb-1">{item.icon}</span>
+                <span className="text-2xl mb-1" aria-hidden="true">{item.icon}</span>
               </motion.div>
               <span className="text-xs font-medium">{item.label}</span>
             </motion.button>
