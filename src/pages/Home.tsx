@@ -3,17 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useUser, useHabits, useDailyChecks } from '../hooks';
 
-const HABIT_ICONS: Record<string, string> = {
-  'water_drop': 'water_drop',
-  'fitness_center': 'fitness_center',
-  'menu_book': 'menu_book',
-  'self_improvement': 'self_improvement',
-  'directions_run': 'directions_run',
-  'restaurant': 'restaurant',
-  'bedtime': 'bedtime',
-  'code': 'code',
-};
-
 function getHabitIcon(name: string): string {
   if (name.includes('물') || name.includes('water')) return 'water_drop';
   if (name.includes('운동') || name.includes('헬스')) return 'fitness_center';
