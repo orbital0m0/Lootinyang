@@ -44,6 +44,22 @@ export const supabaseHelpers = {
     if (error) throw error;
   },
 
+  async resetPasswordForEmail(email: string) {
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    if (error) throw error;
+    return data;
+  },
+
+  async updatePassword(newPassword: string) {
+    const { data, error } = await supabase.auth.updateUser({
+      password: newPassword,
+    });
+    if (error) throw error;
+    return data;
+  },
+
   // 습관 관련
   async getHabits(userId: string) {
     const { data, error } = await supabase

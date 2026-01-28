@@ -10,6 +10,7 @@ import { Achievements } from './pages/Achievements';
 import { CatRoom } from './pages/CatRoom';
 import { DatabaseTest } from './pages/DatabaseTest';
 import { AuthPage } from './pages/Auth';
+import { ResetPassword } from './pages/ResetPassword';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ErrorFallback } from './components/ErrorFallback';
 
@@ -97,6 +98,11 @@ const router = createBrowserRouter([
   {
     path: '/auth',
     element: <PageTransition><AuthPage /></PageTransition>,
+    errorElement: <RouterErrorFallback />,
+  },
+  {
+    path: '/reset-password',
+    element: <PageTransition><ResetPassword /></PageTransition>,
     errorElement: <RouterErrorFallback />,
   },
 ]);

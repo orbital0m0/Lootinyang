@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../services/supabase';
+import { ForgotPasswordModal } from '../components/auth/ForgotPasswordModal';
 
 export function AuthPage() {
   const navigate = useNavigate();
@@ -12,6 +13,7 @@ export function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -238,6 +240,13 @@ export function AuthPage() {
                     aria-required="true"
                     autoComplete="current-password"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowForgotPassword(true)}
+                    className="mt-2 text-sm text-cozy-brown hover:text-cozy-orange transition-colors font-body"
+                  >
+                    비밀번호를 잊으셨나요?
+                  </button>
                 </div>
                 <motion.button
                   type="submit"
@@ -378,6 +387,12 @@ export function AuthPage() {
           </div>
         </motion.div>
       </motion.div>
+
+      {/* Forgot Password Modal */}
+      <ForgotPasswordModal
+        isOpen={showForgotPassword}
+        onClose={() => setShowForgotPassword(false)}
+      />
     </div>
   );
 }

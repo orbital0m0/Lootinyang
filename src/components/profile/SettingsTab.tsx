@@ -1,10 +1,14 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { PasswordChangeModal } from '../auth/PasswordChangeModal';
 
 interface SettingsTabProps {
   onLogout: () => void;
 }
 
 export function SettingsTab({ onLogout }: SettingsTabProps) {
+  const [showPasswordChange, setShowPasswordChange] = useState(false);
+
   const notifications = [
     { name: '습관 리마인더', description: '매일 9시 알림', enabled: true },
     { name: '보상 알림', description: '상자 획득 시 알림', enabled: false },
@@ -18,8 +22,8 @@ export function SettingsTab({ onLogout }: SettingsTabProps) {
   ];
 
   const accountActions = [
-    { icon: '📧', label: '이메일 변경', danger: false },
-    { icon: '🔒', label: '비밀번호 변경', danger: false },
+    { icon: '📧', label: '이메일 변경', danger: false, onClick: () => {} },
+    { icon: '🔒', label: '비밀번호 변경', danger: false, onClick: () => setShowPasswordChange(true) },
   ];
 
   return (
@@ -136,6 +140,7 @@ export function SettingsTab({ onLogout }: SettingsTabProps) {
           {accountActions.map((item, index) => (
             <motion.button
               key={item.label}
+              onClick={item.onClick}
               className="w-full btn-secondary text-left flex items-center gap-3"
               whileHover={{ scale: 1.02, x: 4 }}
               whileTap={{ scale: 0.98 }}
@@ -167,6 +172,12 @@ export function SettingsTab({ onLogout }: SettingsTabProps) {
           </motion.button>
         </div>
       </motion.div>
+
+      {/* Password Change Modal */}
+      <PasswordChangeModal
+        isOpen={showPasswordChange}
+        onClose={() => setShowPasswordChange(false)}
+      />
     </motion.div>
   );
 }
