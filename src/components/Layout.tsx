@@ -4,80 +4,71 @@ import { motion } from 'framer-motion';
 import { useUser } from '../hooks';
 import { ErrorBoundary } from './ErrorBoundary';
 
-// 메인 레이아웃 컴포넌트 - Cozy Game Style
 export function Layout() {
   const location = useLocation();
   const { user } = useUser();
 
-  // 페이지 접속 시 한번만 강제 새로고침
   useEffect(() => {
-    if (!sessionStorage.getItem('v2-loaded')) {
-      sessionStorage.setItem('v2-loaded', 'true');
+    if (!sessionStorage.getItem('v3-loaded')) {
+      sessionStorage.setItem('v3-loaded', 'true');
       window.location.reload();
     }
   }, []);
 
   const navItems = [
-    { path: '/', icon: '🏠', label: '홈' },
-    { path: '/habits', icon: '✅', label: '습관' },
-    { path: '/cat-room', icon: '🐱', label: '고양이방' },
-    { path: '/profile', icon: '👤', label: '프로필' },
+    { path: '/', icon: 'home', label: '홈' },
+    { path: '/habits', icon: 'bar_chart', label: '통계' },
+    { path: '/cat-room', icon: 'pets', label: '고양이 방' },
   ];
 
+  const hideHeaderPaths = ['/auth', '/habits', '/cat-room'];
+  const showHeader = !hideHeaderPaths.includes(location.pathname);
+
   return (
-    <div className="mini-app-container safe-area">
-      {/* 헤더 - Cozy Game Style */}
-      <header
-        className="sticky top-0 z-50"
-        style={{
-          background: 'var(--cozy-warm-white)',
-          borderBottom: '4px solid var(--cozy-brown-light)',
-          boxShadow: '0 4px 12px rgba(139, 115, 85, 0.1)',
-        }}
-      >
-        <div className="px-4 py-3">
-          <div className="flex items-center justify-between">
-            <Link to="/" className="flex items-center gap-2">
-              <motion.span
-                className="text-3xl"
-                animate={{ rotate: [0, -10, 10, 0] }}
-                transition={{ repeat: Infinity, duration: 3 }}
-              >
-                🐱
-              </motion.span>
-              <h1 className="font-display text-xl text-cozy-brown-dark">Lootinyang</h1>
-            </Link>
-            <div className="flex items-center gap-3">
-              <div className="level-badge text-sm">
-                {user?.level || 1}
+    <div className="mini-app-container safe-area bg-background-light">
+      {/* Header - iOS Style (only on home) */}
+      {showHeader && (
+        <header className="sticky top-0 z-50 bg-background-light/80 backdrop-blur-md">
+          <div className="px-6 py-4">
+            <div className="flex items-center justify-between">
+              <Link to="/" className="flex items-center gap-2">
+                <motion.span
+                  className="text-3xl"
+                  animate={{ rotate: [0, -5, 5, 0] }}
+                  transition={{ repeat: Infinity, duration: 3 }}
+                >
+                  🐱
+                </motion.span>
+                <h1 className="font-bold text-xl text-[#1A1C1E]">Habit Cat</h1>
+              </Link>
+              <div className="flex items-center gap-3">
+                {user && (
+                  <div className="flex items-center gap-2 bg-white rounded-full px-3 py-1.5 ios-shadow">
+                    <span className="material-symbols-outlined text-primary text-sm">stars</span>
+                    <span className="text-sm font-bold text-[#1A1C1E]">Lv.{user.level || 1}</span>
+                  </div>
+                )}
+                <button className="btn-icon">
+                  <span className="material-symbols-outlined text-xl text-[#1A1C1E]">
+                    notifications
+                  </span>
+                </button>
               </div>
-              <motion.div
-                className="w-10 h-10 rounded-full flex items-center justify-center text-2xl border-3 border-cozy-brown"
-                style={{
-                  background: 'linear-gradient(135deg, var(--cozy-orange-light) 0%, var(--cozy-orange) 100%)',
-                  borderWidth: '3px',
-                  boxShadow: '0 3px 0 var(--cozy-brown-dark)',
-                }}
-                whileHover={{ scale: 1.1, rotate: 5 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                🐱
-              </motion.div>
             </div>
           </div>
-        </div>
-      </header>
+        </header>
+      )}
 
-      {/* 메인 컨텐츠 */}
+      {/* Main Content */}
       <main className="pb-24 min-h-screen">
         <ErrorBoundary type="page">
           <Outlet />
         </ErrorBoundary>
       </main>
 
-      {/* 하단 네비게이션 - Cozy Game Style */}
+      {/* Bottom Navigation - iOS Style */}
       <nav className="bottom-nav" aria-label="메인 네비게이션">
-        <div className="flex justify-around" role="list">
+        <div className="flex items-center justify-around" role="list">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
             return (
@@ -90,14 +81,13 @@ export function Layout() {
                 role="listitem"
               >
                 <motion.span
-                  className="text-2xl mb-0.5"
-                  animate={isActive ? { scale: [1, 1.2, 1], rotate: [0, -5, 5, 0] } : {}}
-                  transition={{ duration: 0.5 }}
-                  aria-hidden="true"
+                  className={`material-symbols-outlined text-[28px] ${isActive ? 'filled' : ''}`}
+                  animate={isActive ? { y: -2 } : { y: 0 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 17 }}
                 >
                   {item.icon}
                 </motion.span>
-                <span className="text-xs font-heading font-semibold">{item.label}</span>
+                <span className="text-[11px] font-bold">{item.label}</span>
               </Link>
             );
           })}

@@ -2,49 +2,35 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../hooks';
-import { RoomDisplay, ItemGrid, CategoryTabs } from '../components/catroom';
 
 interface Item {
   id: string;
   name: string;
   icon: string;
-  category: 'wallpaper' | 'floor' | 'furniture' | 'decoration';
+  category: 'clothes' | 'hat' | 'necklace' | 'toy' | 'glasses';
   unlocked: boolean;
-  position?: { x: number; y: number };
+  equipped?: boolean;
 }
 
-const initialItems: Item[] = [
-  { id: 'w1', name: '기본 벽지', icon: '🏠', category: 'wallpaper', unlocked: true },
-  { id: 'w2', name: '별이 빛나는 밤', icon: '🌙', category: 'wallpaper', unlocked: false },
-  { id: 'w3', name: '청명한 하늘', icon: '☁️', category: 'wallpaper', unlocked: false },
-  { id: 'f1', name: '기본 바닥', icon: '🟫', category: 'floor', unlocked: true },
-  { id: 'f2', name: '나무 바닥', icon: '🪵', category: 'floor', unlocked: true },
-  { id: 'f3', name: '카펫', icon: '🟤', category: 'floor', unlocked: false },
-  { id: 'fu1', name: '작은 베개', icon: '🛋️', category: 'furniture', unlocked: true },
-  { id: 'fu2', name: '장난감 상자', icon: '📦', category: 'furniture', unlocked: false },
-  { id: 'fu3', name: '야옹이 타워', icon: '🗼', category: 'furniture', unlocked: false },
-  { id: 'd1', name: '작은 꽃', icon: '🌸', category: 'decoration', unlocked: true },
-  { id: 'd2', name: '반짝이 별', icon: '⭐', category: 'decoration', unlocked: false },
-  { id: 'd3', name: '장난감', icon: '🧸', category: 'decoration', unlocked: false },
-];
-
-const initialPlacedItems: Item[] = [
-  { id: 'w1', name: '기본 벽지', icon: '🏠', category: 'wallpaper', unlocked: true, position: { x: 0, y: 0 } },
-  { id: 'f1', name: '기본 바닥', icon: '🟫', category: 'floor', unlocked: true, position: { x: 0, y: 0 } },
-  { id: 'fu1', name: '작은 베개', icon: '🛋️', category: 'furniture', unlocked: true, position: { x: 150, y: 200 } },
-  { id: 'd1', name: '작은 꽃', icon: '🌸', category: 'decoration', unlocked: true, position: { x: 50, y: 180 } },
+const CAT_ITEMS: Item[] = [
+  { id: 'scarf1', name: '빨간 스카프', icon: '🧣', category: 'clothes', unlocked: true, equipped: true },
+  { id: 'hat1', name: '밀짚모자', icon: '👒', category: 'hat', unlocked: true },
+  { id: 'neck1', name: '빨간 목도리', icon: '🎀', category: 'necklace', unlocked: true },
+  { id: 'lock1', name: '잠김', icon: '🔒', category: 'toy', unlocked: false },
+  { id: 'glasses1', name: '노란 안경', icon: '🕶️', category: 'glasses', unlocked: true },
+  { id: 'bell1', name: '방울', icon: '🔔', category: 'necklace', unlocked: true },
+  { id: 'fish1', name: '생선 인형', icon: '🐟', category: 'toy', unlocked: true },
+  { id: 'yarn1', name: '털실뭉치', icon: '🧶', category: 'toy', unlocked: true },
 ];
 
 export function CatRoom() {
   const { user } = useUser();
   const navigate = useNavigate();
-  const [items] = useState<Item[]>(initialItems);
-  const [activeTab, setActiveTab] = useState<'room' | 'inventory'>('room');
-  const [selectedCategory, setSelectedCategory] = useState<Item['category'] | 'all'>('all');
-  const [placedItems, setPlacedItems] = useState<Item[]>(initialPlacedItems);
-  const [selectedItem, setSelectedItem] = useState<Item | null>(null);
-  const [draggedItem, setDraggedItem] = useState<Item | null>(null);
-  const [catReaction, setCatReaction] = useState<'happy' | 'love' | 'normal'>('normal');
+  const [activeTab, setActiveTab] = useState<'closet' | 'room'>('closet');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [items, setItems] = useState<Item[]>(CAT_ITEMS);
+  const [coins] = useState(1250);
+  const [nextBoxProgress] = useState(85);
 
   useEffect(() => {
     if (!user) {
@@ -52,181 +38,187 @@ export function CatRoom() {
     }
   }, [user, navigate]);
 
-  const handleItemClick = (item: Item) => {
-    if (activeTab === 'inventory' && item.unlocked) {
-      setSelectedItem(item);
-    }
+  const categories = [
+    { id: 'all', label: '전체' },
+    { id: 'hat', label: '모자' },
+    { id: 'necklace', label: '목걸이' },
+    { id: 'toy', label: '장난감' },
+    { id: 'glasses', label: '안경' },
+  ];
+
+  const filteredItems = selectedCategory === 'all'
+    ? items
+    : items.filter(item => item.category === selectedCategory);
+
+  const handleItemClick = (itemId: string) => {
+    setItems(prevItems =>
+      prevItems.map(item => ({
+        ...item,
+        equipped: item.id === itemId ? !item.equipped : item.equipped,
+      }))
+    );
   };
-
-  const handleDragStart = (item: Item) => {
-    if (item.category === 'wallpaper' || item.category === 'floor') return;
-    setDraggedItem(item);
-  };
-
-  const handleDragEnd = (event: React.DragEvent) => {
-    if (!draggedItem) return;
-    const roomRect = (event.target as HTMLElement).closest('.room-container')?.getBoundingClientRect();
-    if (!roomRect) return;
-    const x = event.clientX - roomRect.left - 25;
-    const y = event.clientY - roomRect.top - 25;
-    setPlacedItems(prev => {
-      const exists = prev.find(i => i.id === draggedItem.id);
-      if (exists) {
-        return prev.map(i => i.id === draggedItem.id ? { ...i, position: { x, y } } : i);
-      }
-      return [...prev, { ...draggedItem, position: { x, y } }];
-    });
-    setDraggedItem(null);
-  };
-
-  const handlePlaceItem = () => {
-    if (!selectedItem) return;
-    const exists = placedItems.find(i => i.id === selectedItem.id);
-    if (!exists) {
-      setPlacedItems(prev => [...prev, { ...selectedItem, position: { x: 100, y: 200 } }]);
-    }
-    setSelectedItem(null);
-  };
-
-  const handleRemoveItem = (itemId: string) => {
-    if (itemId === 'w1' || itemId === 'f1') return;
-    setPlacedItems(prev => prev.filter(i => i.id !== itemId));
-  };
-
-  const handleCatClick = () => {
-    const reactions: Array<'happy' | 'love'> = ['happy', 'love'];
-    setCatReaction(reactions[Math.floor(Math.random() * reactions.length)]);
-    setTimeout(() => setCatReaction('normal'), 2000);
-  };
-
-  const filteredItems = items.filter(item => {
-    if (selectedCategory === 'all') return true;
-    return item.category === selectedCategory;
-  });
-
-  const unlockedCount = items.filter(i => i.unlocked).length;
 
   return (
-    <div className="min-h-screen pb-24 page-enter">
+    <div className="flex flex-col min-h-screen bg-background-light pb-[84px] page-enter">
       {/* Header */}
-      <motion.div
-        className="pt-6 pb-4 px-5"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <motion.span
-              className="text-4xl"
-              animate={{ rotate: [0, -10, 10, 0] }}
-              transition={{ repeat: Infinity, duration: 3 }}
-              aria-hidden="true"
-            >
-              🏠
-            </motion.span>
-            <div>
-              <h2 className="font-display text-2xl text-cozy-brown-dark">고양이 방</h2>
-              <p className="text-sm text-cozy-brown font-body">
-                아이템으로 방을 꾸며보세요!
-              </p>
-            </div>
-          </div>
-          <div className="stat-box py-2 px-4" aria-label={`보유 아이템 ${unlockedCount}개`}>
-            <div className="stat-value text-lg">{unlockedCount}</div>
-            <div className="stat-label">보유 아이템</div>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Tab Navigation */}
-      <div className="px-4 mb-4">
-        <motion.div
-          className="flex bg-cozy-cream rounded-2xl p-1 border-3 border-cozy-brown-light"
-          style={{ borderWidth: '3px' }}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          role="tablist"
-          aria-label="고양이 방 탭"
+      <div className="flex items-center bg-transparent p-4 pb-2 justify-between">
+        <button
+          onClick={() => navigate(-1)}
+          className="text-slate-800 flex size-12 shrink-0 items-center justify-start cursor-pointer"
         >
-          <motion.button
-            onClick={() => setActiveTab('room')}
-            className={`flex-1 py-3 px-4 rounded-xl font-heading font-semibold text-sm transition-all ${
-              activeTab === 'room'
-                ? 'bg-cozy-sage text-white shadow-md'
-                : 'text-cozy-brown hover:bg-cozy-paper'
-            }`}
-            whileTap={{ scale: 0.98 }}
-            role="tab"
-            aria-selected={activeTab === 'room'}
-            aria-controls="room-panel"
-          >
-            <span className="mr-1" aria-hidden="true">🏠</span> 방 보기
-          </motion.button>
-          <motion.button
-            onClick={() => setActiveTab('inventory')}
-            className={`flex-1 py-3 px-4 rounded-xl font-heading font-semibold text-sm transition-all ${
-              activeTab === 'inventory'
-                ? 'bg-cozy-mustard text-white shadow-md'
-                : 'text-cozy-brown hover:bg-cozy-paper'
-            }`}
-            whileTap={{ scale: 0.98 }}
-            role="tab"
-            aria-selected={activeTab === 'inventory'}
-            aria-controls="inventory-panel"
-          >
-            <span className="mr-1" aria-hidden="true">📦</span> 아이템
-          </motion.button>
-        </motion.div>
+          <span className="material-symbols-outlined">arrow_back_ios_new</span>
+        </button>
+        <h2 className="text-slate-900 text-lg font-bold leading-tight tracking-tight flex-1 text-center">
+          내 고양이와 방 꾸미기
+        </h2>
+        <div className="flex w-12 items-center justify-end">
+          <button className="flex size-10 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-white/50 text-highlight">
+            <span className="material-symbols-outlined">shopping_bag</span>
+          </button>
+        </div>
       </div>
 
-      {/* Tab Content */}
-      <AnimatePresence mode="wait">
-        {activeTab === 'room' ? (
+      {/* Progress Bar */}
+      <div className="px-6 py-2">
+        <div className="flex items-center justify-between mb-1">
+          <span className="text-[11px] font-bold text-slate-500">다음 상자까지</span>
+          <span className="text-[11px] font-bold text-highlight">{nextBoxProgress}%</span>
+        </div>
+        <div className="w-full h-3 bg-white/40 rounded-full overflow-hidden">
           <motion.div
-            key="room"
-            className="px-4"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.25 }}
-            id="room-panel"
-            role="tabpanel"
-          >
-            <RoomDisplay
-              placedItems={placedItems}
-              catReaction={catReaction}
-              onDragStart={handleDragStart}
-              onDragEnd={handleDragEnd}
-              onRemoveItem={handleRemoveItem}
-              onCatClick={handleCatClick}
-            />
-          </motion.div>
-        ) : (
+            className="h-full bg-highlight rounded-full"
+            initial={{ width: 0 }}
+            animate={{ width: `${nextBoxProgress}%` }}
+            transition={{ duration: 0.8 }}
+          />
+        </div>
+      </div>
+
+      {/* Cat Display Area */}
+      <div className="flex-grow flex flex-col items-center justify-center p-6 relative">
+        <div className="w-full max-w-sm aspect-square relative rounded-xl bg-white/30 backdrop-blur-sm border-4 border-white/50 flex items-center justify-center overflow-hidden">
+          {/* Cat Shadow */}
+          <div className="absolute bottom-10 w-48 h-12 bg-highlight/20 rounded-[100%] blur-sm"></div>
+
+          {/* Cat Character */}
           <motion.div
-            key="inventory"
-            className="px-4"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.25 }}
-            id="inventory-panel"
-            role="tabpanel"
+            className="relative w-48 h-48 flex items-center justify-center"
+            animate={{ y: [0, -5, 0] }}
+            transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
           >
-            <CategoryTabs
-              selectedCategory={selectedCategory}
-              onSelectCategory={setSelectedCategory}
-            />
-            <ItemGrid
-              items={filteredItems}
-              selectedItem={selectedItem}
-              onItemClick={handleItemClick}
-              onPlaceItem={handlePlaceItem}
-              onCancelSelect={() => setSelectedItem(null)}
-            />
+            <div className="text-[120px]">🐱</div>
+            {/* Equipped Items Display */}
+            {items.filter(i => i.equipped).map(item => (
+              <motion.span
+                key={item.id}
+                className="absolute text-3xl"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                style={{
+                  top: item.category === 'hat' ? '-10px' : '50%',
+                  right: item.category === 'necklace' ? '-20px' : undefined,
+                }}
+              >
+                {item.icon}
+              </motion.span>
+            ))}
           </motion.div>
-        )}
-      </AnimatePresence>
+
+          {/* Coins Display */}
+          <div className="absolute top-4 right-4 bg-white px-3 py-1.5 rounded-full shadow-sm flex items-center gap-1.5">
+            <span className="material-symbols-outlined text-highlight text-sm">potted_plant</span>
+            <span className="text-sm font-bold text-slate-700">{coins.toLocaleString()}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom Panel */}
+      <div className="bg-white rounded-t-3xl shadow-2xl p-4">
+        {/* Tab Switch */}
+        <div className="flex px-2 py-3">
+          <div className="tab-switch flex-1">
+            <button
+              onClick={() => setActiveTab('closet')}
+              className={`tab-item ${activeTab === 'closet' ? 'active' : ''}`}
+            >
+              옷장
+            </button>
+            <button
+              onClick={() => setActiveTab('room')}
+              className={`tab-item ${activeTab === 'room' ? 'active' : ''}`}
+            >
+              방 꾸미기
+            </button>
+          </div>
+        </div>
+
+        {/* Category Pills */}
+        <div className="flex gap-2 overflow-x-auto px-2 py-2 hide-scrollbar">
+          {categories.map(cat => (
+            <button
+              key={cat.id}
+              onClick={() => setSelectedCategory(cat.id)}
+              className={`filter-pill ${selectedCategory === cat.id ? 'active' : ''}`}
+            >
+              {cat.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Items Grid */}
+        <div className="grid grid-cols-4 gap-4 p-2 mt-2 h-48 overflow-y-auto hide-scrollbar">
+          <AnimatePresence>
+            {filteredItems.map((item, index) => (
+              <motion.div
+                key={item.id}
+                className="flex flex-col items-center gap-2"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+              >
+                <button
+                  onClick={() => item.unlocked && handleItemClick(item.id)}
+                  disabled={!item.unlocked}
+                  className={`w-full aspect-square rounded-2xl flex items-center justify-center relative overflow-hidden p-2 transition-all ${
+                    item.equipped
+                      ? 'bg-highlight/10 border-2 border-highlight'
+                      : item.unlocked
+                      ? 'bg-slate-50 border-2 border-transparent hover:border-slate-200'
+                      : 'bg-slate-50 border-2 border-transparent opacity-40'
+                  }`}
+                >
+                  <span className={`text-3xl ${!item.unlocked ? 'blur-[1px]' : ''}`}>
+                    {item.icon}
+                  </span>
+                  {item.equipped && (
+                    <div className="absolute top-1 right-1 bg-highlight rounded-full size-4 flex items-center justify-center">
+                      <span className="material-symbols-outlined text-[10px] text-white font-bold">
+                        check
+                      </span>
+                    </div>
+                  )}
+                  {!item.unlocked && (
+                    <span className="material-symbols-outlined absolute text-slate-400">
+                      lock
+                    </span>
+                  )}
+                </button>
+                <span className={`text-[10px] font-bold ${item.equipped ? 'text-highlight' : 'text-slate-400'}`}>
+                  {item.equipped ? '착용 중' : item.name}
+                </span>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </div>
+
+        {/* Save Button */}
+        <div className="flex px-2 py-3 mt-2">
+          <button className="btn-primary">
+            스타일 저장하기
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

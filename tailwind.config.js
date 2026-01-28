@@ -2,24 +2,32 @@
 export default {
   content: [
     "./index.html",
-    "./src/**/*.{js,tstx}",
+    "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
     extend: {
-      maxWidth: '375px',
       colors: {
+        // New Design System Colors
         primary: {
-          50: '#fff1f2',
-          100: '#ffe4e6',
-          200: '#fecdd3',
-          300: '#fda4af',
-          400: '#fb7185',
-          500: '#f43f5e',
-          600: '#e11d48',
-          700: '#be123c',
-          800: '#9f1239',
-          900: '#881337',
+          DEFAULT: '#3E94E4',
+          light: '#5BA8ED',
+          dark: '#2B7ACC',
+          50: '#F0F6FF',
+          100: '#E1EDFF',
+          200: '#C3DBFF',
+          500: '#3E94E4',
+          600: '#2B7ACC',
         },
+        highlight: {
+          DEFAULT: '#FF4D91',
+          light: '#FF6FA8',
+          dark: '#E63B7A',
+        },
+        background: {
+          light: '#F0F6FF',
+          dark: '#0B121E',
+        },
+        // Cat Room Colors
         cat: {
           orange: '#ff8c42',
           'orange-light': '#ffb380',
@@ -28,8 +36,13 @@ export default {
           'pink-light': '#ffd0dc',
           'pink-dark': '#ffb0c0',
           purple: '#b19cd9',
-          'purple-light': '#c8b6e6',
-          'purple-dark': '#9b84c6',
+        },
+        // Accent Colors (for stats page)
+        accent: {
+          blue: '#E3F2FD',
+          'blue-dark': '#90CAF9',
+          pink: '#FCE4EC',
+          'pink-dark': '#F06292',
         },
         success: {
           50: '#ecfdf5',
@@ -46,41 +59,42 @@ export default {
           500: '#ef4444',
           600: '#dc2626',
         },
-        info: {
-          50: '#eff6ff',
-          500: '#3b82f6',
-          600: '#2563eb',
-        },
+      },
+      fontFamily: {
+        display: ['Plus Jakarta Sans', 'Pretendard', 'sans-serif'],
+        body: ['Plus Jakarta Sans', 'Pretendard', 'sans-serif'],
+      },
+      borderRadius: {
+        DEFAULT: '1rem',
+        lg: '1.5rem',
+        xl: '2.25rem',
+        '2xl': '2rem',
+        '3xl': '2.5rem',
+      },
+      boxShadow: {
+        'ios': '0 4px 24px -1px rgba(0, 0, 0, 0.04)',
+        'ios-lg': '0 8px 32px -1px rgba(0, 0, 0, 0.08)',
+        'highlight': '0 4px 20px rgba(255, 77, 145, 0.2)',
       },
       animation: {
         'bounce-slow': 'bounce 2s infinite',
         'wiggle': 'wiggle 1s ease-in-out infinite',
-        'bounce-cat': 'bounce-cat 2s ease-in-out infinite',
+        'ping-slow': 'ping 2s cubic-bezier(0, 0, 0.2, 1) infinite',
         'fade-in': 'fadeIn 0.3s ease-out',
         'slide-up': 'slideUp 0.3s ease-out',
-        'pulse-slow': 'pulse 3s ease-in-out infinite',
-        'sparkle': 'sparkle 1s ease-in-out',
       },
       keyframes: {
         wiggle: {
           '0%, 100%': { transform: 'rotate(-3deg)' },
           '50%': { transform: 'rotate(3deg)' },
         },
-        'bounce-cat': {
-          '0%, 100%': { transform: 'translateY(0) scale(1)' },
-          '50%': { transform: 'translateY(-10px) scale(1.05)' },
-        },
         fadeIn: {
-          'from': { opacity: '0', transform: 'translateY(20px)' },
-          'to': { opacity: '1', transform: 'translateY(0)' },
+          from: { opacity: '0', transform: 'translateY(20px)' },
+          to: { opacity: '1', transform: 'translateY(0)' },
         },
         slideUp: {
-          'from': { transform: 'translateY(100%)' },
-          'to': { transform: 'translateY(0)' },
-        },
-        sparkle: {
-          '0%, 100%': { opacity: '0', transform: 'scale(0)' },
-          '50%': { opacity: '1', transform: 'scale(1)' },
+          from: { transform: 'translateY(100%)' },
+          to: { transform: 'translateY(0)' },
         },
       },
     },

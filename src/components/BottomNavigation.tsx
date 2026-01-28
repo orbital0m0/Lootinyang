@@ -6,15 +6,14 @@ export function BottomNavigation() {
   const navigate = useNavigate();
 
   const navItems = [
-    { path: '/', icon: '🏠', label: '홈' },
-    { path: '/habits', icon: '📊', label: '트래커' },
-    { path: '/cat-room', icon: '🐱', label: '고양이 방' },
-    { path: '/profile', icon: '👤', label: '프로필' },
+    { path: '/', icon: 'home', iconFilled: 'home', label: '홈' },
+    { path: '/habits', icon: 'bar_chart', iconFilled: 'bar_chart', label: '통계' },
+    { path: '/cat-room', icon: 'pets', iconFilled: 'pets', label: '고양이 방' },
   ];
 
   return (
     <nav className="bottom-nav" aria-label="메인 네비게이션">
-      <div className="flex justify-around" role="list">
+      <div className="flex items-center justify-around" role="list">
         {navItems.map((item) => {
           const isActive = location.pathname === item.path;
 
@@ -29,15 +28,16 @@ export function BottomNavigation() {
               aria-label={`${item.label} ${isActive ? '(현재 페이지)' : ''}`}
               role="listitem"
             >
-              <motion.div
+              <motion.span
+                className={`material-symbols-outlined text-[28px] ${isActive ? 'filled' : ''}`}
                 animate={{
                   y: isActive ? -2 : 0,
                 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 17 }}
               >
-                <span className="text-2xl mb-1" aria-hidden="true">{item.icon}</span>
-              </motion.div>
-              <span className="text-xs font-medium">{item.label}</span>
+                {item.icon}
+              </motion.span>
+              <span className="text-[11px] font-bold">{item.label}</span>
             </motion.button>
           );
         })}
