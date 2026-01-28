@@ -78,6 +78,7 @@ export function HabitsPage() {
       user_id: user.id,
       name: newHabitName,
       weekly_target: newHabitFrequency,
+      is_active: true,
     });
     setNewHabitName('');
     setNewHabitFrequency(4);
