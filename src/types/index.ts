@@ -6,7 +6,6 @@ export interface User {
   email?: string;
   level: number;
   exp: number;
-  totalHabits?: number;
   total_habits?: number;
   streak: number;
   created_at: string;
@@ -180,15 +179,6 @@ export interface UseAchievementsReturn {
   getTotalPoints: () => number;
   getLockedAchievements: () => Achievement[];
   getUnlockedAchievements: () => (UserAchievement & { achievement: Achievement })[];
-}
-
-export interface UseDailyChecksReturn {
-  dailyChecks: DailyCheck[];
-  loading: boolean;
-  error: string | null;
-  checkHabit: (habitId: string, date: string) => Promise<void>;
-  uncheckHabit: (habitId: string, date: string) => Promise<void>;
-  getWeeklyProgress: (habitId: string, weeklyTarget: number) => number;
 }
 
 // 게임 관련 타입

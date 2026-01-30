@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useHabits, useDailyChecks, useUser } from '../hooks';
+import { getHabitIcon } from '../utils/habitIcon';
 import type { Habit } from '../types';
 
 const THEME_COLORS = [
@@ -12,23 +13,11 @@ const THEME_COLORS = [
   { id: 'purple', color: '#8B5CF6', label: '보라' },
 ];
 
-function getHabitIcon(name: string): string {
-  if (name.includes('물') || name.includes('water')) return 'water_drop';
-  if (name.includes('운동') || name.includes('헬스')) return 'fitness_center';
-  if (name.includes('책') || name.includes('독서')) return 'menu_book';
-  if (name.includes('명상') || name.includes('meditation')) return 'self_improvement';
-  if (name.includes('달리기') || name.includes('걷기')) return 'directions_run';
-  if (name.includes('식사') || name.includes('다이어트')) return 'restaurant';
-  if (name.includes('수면') || name.includes('잠')) return 'bedtime';
-  if (name.includes('코딩') || name.includes('공부')) return 'code';
-  return 'check_circle';
-}
-
 export function HabitsPage() {
   const { user } = useUser();
   const navigate = useNavigate();
   const { habits, createHabit, deleteHabit, isCreating } = useHabits(user?.id);
-  const { checkHabit, uncheckHabit, isTodayChecked, isDateChecked, getCheckedDatesThisWeek, isChecking } = useDailyChecks();
+  const { checkHabit, uncheckHabit, isTodayChecked, isDateChecked, getCheckedDatesThisWeek, isChecking } = useDailyChecks(user?.id);
 
   const [showForm, setShowForm] = useState(false);
   const [newHabitName, setNewHabitName] = useState('');
@@ -43,9 +32,10 @@ export function HabitsPage() {
     }
   }, [user, navigate]);
 
-  const getWeekDates = () => {
-    const today = new Date();
-    const startOfWeek = new Date(today);
+  // 주간 날짜 배열 메모이제이션
+  const weekDates = useMemo(() => {
+    const now = new Date();
+    const startOfWeek = new Date(now);
     const day = startOfWeek.getDay();
     const diff = startOfWeek.getDate() - day + (day === 0 ? -6 : 1);
     startOfWeek.setDate(diff);
@@ -57,10 +47,10 @@ export function HabitsPage() {
       dates.push(date.toISOString().split('T')[0]);
     }
     return dates;
-  };
+  }, []);
 
-  const weekDates = getWeekDates();
-  const today = new Date().toISOString().split('T')[0];
+  // 오늘 날짜 메모이제이션
+  const today = useMemo(() => new Date().toISOString().split('T')[0], []);
 
   const getWeeklyProgress = (habit: Habit) => {
     if (!habit.weekly_target) return 0;

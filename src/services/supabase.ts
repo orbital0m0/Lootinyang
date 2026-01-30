@@ -114,7 +114,21 @@ export const supabaseHelpers = {
       .gte('date', startDate)
       .lte('date', endDate)
       .order('date', { ascending: true });
-    
+
+    if (error) throw error;
+    return data;
+  },
+
+  // 사용자의 모든 습관에 대한 일일 체크 조회
+  async getDailyChecksByUser(userId: string, startDate: string, endDate: string) {
+    const { data, error } = await supabase
+      .from('daily_checks')
+      .select('*, habits!inner(user_id)')
+      .eq('habits.user_id', userId)
+      .gte('date', startDate)
+      .lte('date', endDate)
+      .order('date', { ascending: true });
+
     if (error) throw error;
     return data;
   },
