@@ -1,10 +1,10 @@
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, type TargetAndTransition } from 'framer-motion';
 
 interface BaseModalProps {
   isOpen: boolean;
   onClose: () => void;
   icon: string;
-  iconAnimation?: object;
+  iconAnimation?: TargetAndTransition;
   title: string;
   subtitle?: string;
   children: React.ReactNode;
