@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase, supabaseHelpers } from '../services/supabase';
+import { APP_CONFIG } from '../utils/constants';
 import type { User, UseUserReturn } from '../types';
 
 // 사용자 정보 관리 커스텀 훅
@@ -99,16 +100,15 @@ export function useUser(): UseUserReturn {
   const addExpMutation = useMutation({
     mutationFn: async (exp: number) => {
       if (!user?.id) throw new Error('사용자 정보가 없습니다.');
-      
+
       const newExp = user.exp + exp;
-      const newLevel = Math.floor(newExp / 100) + 1;
-      const maxLevel = 100;
-      
+      const newLevel = Math.floor(newExp / APP_CONFIG.EXP_PER_LEVEL) + 1;
+
       const updates = {
         exp: newExp,
-        level: Math.min(newLevel, maxLevel),
+        level: Math.min(newLevel, APP_CONFIG.MAX_LEVEL),
       };
-      
+
       return supabaseHelpers.updateUser(user.id, updates);
     },
     onSuccess: (data) => {
@@ -155,15 +155,15 @@ export function useUser(): UseUserReturn {
 
   // 레벨업 경험치 계산
   const getExpToNextLevel = (): number => {
-    if (!user) return 100;
-    const currentLevel = Math.floor(user.exp / 100) + 1;
-    return (currentLevel * 100) - user.exp;
+    if (!user) return APP_CONFIG.EXP_PER_LEVEL;
+    const currentLevel = Math.floor(user.exp / APP_CONFIG.EXP_PER_LEVEL) + 1;
+    return (currentLevel * APP_CONFIG.EXP_PER_LEVEL) - user.exp;
   };
 
   // 레벨업 가능 여부
   const canLevelUp = (): boolean => {
     if (!user) return false;
-    return user.exp >= user.level * 100;
+    return user.exp >= user.level * APP_CONFIG.EXP_PER_LEVEL;
   };
 
   return {

@@ -5,14 +5,6 @@ import { useHabits, useDailyChecks, useUser } from '../hooks';
 import { getHabitIcon } from '../utils/habitIcon';
 import type { Habit } from '../types';
 
-const THEME_COLORS = [
-  { id: 'blue', color: '#3E94E4', label: '파랑' },
-  { id: 'pink', color: '#FF4D91', label: '핑크' },
-  { id: 'orange', color: '#FF8C42', label: '오렌지' },
-  { id: 'green', color: '#10B981', label: '초록' },
-  { id: 'purple', color: '#8B5CF6', label: '보라' },
-];
-
 export function HabitsPage() {
   const { user } = useUser();
   const navigate = useNavigate();
@@ -22,7 +14,6 @@ export function HabitsPage() {
   const [showForm, setShowForm] = useState(false);
   const [newHabitName, setNewHabitName] = useState('');
   const [newHabitFrequency, setNewHabitFrequency] = useState(4);
-  const [selectedColor, setSelectedColor] = useState('blue');
 
   const weekDays = ['월', '화', '수', '목', '금', '토', '일'];
 
@@ -357,27 +348,6 @@ export function HabitsPage() {
                       >
                         {freq === 7 ? '매일' : `${freq}회`}
                       </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Theme Color */}
-                <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-2">
-                    테마 컬러
-                  </label>
-                  <div className="flex gap-3">
-                    {THEME_COLORS.map(theme => (
-                      <button
-                        key={theme.id}
-                        onClick={() => setSelectedColor(theme.id)}
-                        className={`w-10 h-10 rounded-full transition-all ${
-                          selectedColor === theme.id
-                            ? 'ring-2 ring-offset-2 ring-slate-400'
-                            : ''
-                        }`}
-                        style={{ backgroundColor: theme.color }}
-                      />
                     ))}
                   </div>
                 </div>
