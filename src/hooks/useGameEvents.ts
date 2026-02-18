@@ -61,7 +61,7 @@ export function useGameEvents(): UseGameEventsReturn {
   }, [queryClient]);
 
   // 습관 체크 시 게임 이벤트 처리
-  const processHabitCheck = useCallback(async (habitId: string, userId: string) => {
+  const processHabitCheck = useCallback(async (_habitId: string, userId: string) => {
     if (isProcessing) return;
     setIsProcessing(true);
 
