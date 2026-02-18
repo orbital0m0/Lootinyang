@@ -14,7 +14,7 @@ export function Rewards() {
     openRewardBox,
     isOpening,
   } = useRewards(user?.id);
-  const { items: userItems, loading: itemsLoading, useItem } = useItems(user?.id);
+  const { items: userItems, loading: itemsLoading, useItem: consumeItem } = useItems(user?.id);
 
   const [selectedTab, setSelectedTab] = useState<'boxes' | 'items'>('boxes');
 
@@ -30,7 +30,7 @@ export function Rewards() {
 
   const handleUseItem = async (userItemId: string) => {
     try {
-      await useItem(userItemId);
+      await consumeItem(userItemId);
     } catch (error) {
       console.error('아이템 사용 실패:', error);
     }
