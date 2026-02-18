@@ -1,15 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { useUser, useHabits, useDailyChecks } from '../hooks';
+import { useUser, useHabits, useDailyChecks, useRewards, useGameEvents } from '../hooks';
 import { getHabitIcon } from '../utils/habitIcon';
+import type { Habit } from '../types';
 
 export function Home() {
   const { user } = useUser();
   const navigate = useNavigate();
   const { habits } = useHabits(user?.id);
   const { checkHabit, uncheckHabit, isTodayChecked, getCheckedDatesThisWeek } = useDailyChecks(user?.id);
-  const [daysUntilReward] = useState(2);
+  const { availableBoxes } = useRewards(user?.id);
+  const gameEvents = useGameEvents();
 
   useEffect(() => {
     if (!user) {
@@ -17,12 +19,34 @@ export function Home() {
     }
   }, [user, navigate]);
 
+  // "보상까지 N일" 실제 계산
+  const daysUntilReward = useMemo(() => {
+    if (habits.length === 0) return 0;
+
+    // 이번 주 남은 체크 수 합산
+    let totalRemaining = 0;
+    for (const habit of habits) {
+      const checked = getCheckedDatesThisWeek(habit.id).length;
+      const remaining = Math.max(0, (habit.weekly_target || 5) - checked);
+      totalRemaining += remaining;
+    }
+
+    // 남은 체크를 하루에 최대 습관 수만큼 할 수 있다고 가정
+    return habits.length > 0 ? Math.ceil(totalRemaining / habits.length) : 0;
+  }, [habits, getCheckedDatesThisWeek]);
+
   const handleToggleCheck = async (habitId: string) => {
     const today = new Date().toISOString().split('T')[0];
     if (isTodayChecked(habitId)) {
       await uncheckHabit(habitId, today);
     } else {
       await checkHabit(habitId, today);
+      // 게임 이벤트 처리 (경험치, 스트릭, 업적)
+      if (user) {
+        await gameEvents.processHabitCheck(habitId, user.id);
+        // 주간 목표 달성 체크
+        await gameEvents.processWeeklyTarget(user.id, habits);
+      }
     }
   };
 
@@ -42,11 +66,45 @@ export function Home() {
           나의 목표 대시보드
         </h2>
         <div className="flex w-10 items-center justify-end">
-          <button className="flex items-center justify-center rounded-full size-10 bg-white text-[#1A1C1E] ios-shadow">
+          <button
+            onClick={() => navigate('/rewards')}
+            className="flex items-center justify-center rounded-full size-10 bg-white text-[#1A1C1E] ios-shadow relative"
+          >
             <span className="material-symbols-outlined text-xl">notifications</span>
+            {availableBoxes.length > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full size-5 flex items-center justify-center">
+                {availableBoxes.length}
+              </span>
+            )}
           </button>
         </div>
       </div>
+
+      {/* User Stats Bar */}
+      {user && (
+        <motion.div
+          className="mx-6 mb-2 flex items-center justify-between bg-white/70 rounded-xl px-4 py-2"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold text-slate-500">Lv.{user.level}</span>
+            <div className="w-20 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+              <motion.div
+                className="h-full bg-gradient-to-r from-cat-orange to-cat-pink rounded-full"
+                initial={{ width: 0 }}
+                animate={{ width: `${(user.exp % 100)}%` }}
+                transition={{ duration: 0.6 }}
+              />
+            </div>
+          </div>
+          <div className="flex items-center gap-3 text-xs text-slate-500">
+            <span>🔥 {user.streak}일</span>
+            <span>📦 {availableBoxes.length}</span>
+          </div>
+        </motion.div>
+      )}
 
       {/* Reward Box Section */}
       <motion.div
@@ -60,17 +118,27 @@ export function Home() {
             <span className="material-symbols-outlined !text-[80px] text-primary/40 font-extralight">
               redeem
             </span>
-            <div className="absolute -top-1 -right-1">
-              <div className="bg-highlight size-3 rounded-full animate-ping absolute"></div>
-              <div className="bg-highlight size-3 rounded-full relative"></div>
-            </div>
+            {availableBoxes.length > 0 && (
+              <div className="absolute -top-1 -right-1">
+                <div className="bg-highlight size-3 rounded-full animate-ping absolute"></div>
+                <div className="bg-highlight size-3 rounded-full relative"></div>
+              </div>
+            )}
           </div>
           <div className="mt-4 text-center">
             <h3 className="text-[#1A1C1E] text-lg font-bold leading-tight">
-              보상까지 {daysUntilReward}일 남았어요
+              {availableBoxes.length > 0
+                ? `미열린 보상 상자 ${availableBoxes.length}개!`
+                : daysUntilReward > 0
+                  ? `보상까지 ${daysUntilReward}일 남았어요`
+                  : '이번 주 목표를 달성했어요!'
+              }
             </h3>
             <p className="text-slate-500 text-sm font-medium mt-1">
-              조금만 더 힘내세요!
+              {availableBoxes.length > 0
+                ? '보상 센터에서 상자를 열어보세요!'
+                : '조금만 더 힘내세요!'
+              }
             </p>
           </div>
         </div>
@@ -106,7 +174,7 @@ export function Home() {
               </p>
             </motion.div>
           ) : (
-            habits.map((habit, index) => {
+            habits.map((habit: Habit, index: number) => {
               const progress = getWeeklyProgress(habit.id, habit.weekly_target || 5);
               const progressPercent = Math.min((progress.completed / progress.total) * 100, 100);
               const isCheckedToday = isTodayChecked(habit.id);
@@ -125,6 +193,7 @@ export function Home() {
                       type="checkbox"
                       checked={isCheckedToday}
                       onChange={() => handleToggleCheck(habit.id)}
+                      disabled={gameEvents.isProcessing}
                       className="cursor-pointer"
                     />
                     <div className="icon-circle">

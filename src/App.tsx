@@ -13,6 +13,7 @@ import { AuthPage } from './pages/Auth';
 import { ResetPassword } from './pages/ResetPassword';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ErrorFallback } from './components/ErrorFallback';
+import { ToastProvider } from './components/Toast';
 
 // 페이지 전환 애니메이션 래퍼 컴포넌트
 function PageTransition({ children }: { children: React.ReactNode }) {
@@ -112,9 +113,11 @@ function App() {
   return (
     <ErrorBoundary type="app">
       <QueryClientProvider client={queryClient}>
-        <div className="min-h-screen bg-gray-50">
-          <RouterProvider router={router} />
-        </div>
+        <ToastProvider>
+          <div className="min-h-screen bg-gray-50">
+            <RouterProvider router={router} />
+          </div>
+        </ToastProvider>
       </QueryClientProvider>
     </ErrorBoundary>
   );

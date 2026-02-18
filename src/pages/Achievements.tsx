@@ -1,25 +1,22 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AchievementBadge } from '../components/AchievementBadge';
-import type { Achievement } from '../types';
+import { useUser, useAchievements } from '../hooks';
 
 export function Achievements() {
+  const { user } = useUser();
+  const {
+    allAchievements,
+    loading,
+    error,
+    getAchievementsByCategory,
+    getStatsByCategory,
+    isAchievementUnlocked,
+    getTotalPoints,
+    getProgressByAchievement,
+  } = useAchievements(user?.id);
+
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'challenge' | 'consistency' | 'reward' | 'legendary'>('all');
-
-  // 샘플 업적 데이터
-  const sampleAchievements: Achievement[] = [
-    { id: '1', name: '첫걸음', description: '첫 습관을 생성했어요', icon: '👶', condition: '습관 1개 생성', points: 10, badge_color: 'common' },
-    { id: '2', name: '습관 수집가', description: '5개의 습관을 생성했어요', icon: '📚', condition: '습관 5개 생성', points: 20, badge_color: 'rare' },
-    { id: '3', name: '3주 연속 성공', description: '3주 연속으로 주간 목표를 달성했어요', icon: '🏅', condition: '3주 연속 주간 목표 달성', points: 50, badge_color: 'epic' },
-    { id: '4', name: '일주일 꾸준함', description: '7일 연속 습관을 달성했어요', icon: '📆', condition: '7일 연속 습관 달성', points: 30, badge_color: 'rare' },
-    { id: '5', name: '한달의 달인', description: '30일 연속 습관을 달성했어요', icon: '📈', condition: '30일 연속 습관 달성', points: 100, badge_color: 'epic' },
-    { id: '6', name: '완벽한 한달', description: '한달 동안 모든 습관을 100% 달성했어요', icon: '💯', condition: '한달 100% 달성', points: 150, badge_color: 'legendary' },
-    { id: '7', name: '보상 사냥꾼', description: '10개의 보상 상자를 열었어요', icon: '🎁', condition: '보상 상자 10개 오픈', points: 40, badge_color: 'rare' },
-    { id: '8', name: '전설의 레벨', description: '레벨 50에 도달했어요', icon: '🏆', condition: '레벨 50 도달', points: 500, badge_color: 'legendary' },
-  ];
-
-  // 샘플 업적 달성 상태
-  const unlockedAchievements = new Set(['1', '4']);
 
   // 업적 카테고리
   const categories = [
@@ -30,21 +27,38 @@ export function Achievements() {
     { id: 'legendary', name: '전설', icon: '⭐' },
   ];
 
-  // 필터링된 업적
+  // 카테고리별 필터링
+  const categoryMap = getAchievementsByCategory();
   const filteredAchievements = selectedCategory === 'all'
-    ? sampleAchievements
-    : sampleAchievements.filter(a => {
-        if (selectedCategory === 'challenge') return ['1', '2'].includes(a.id);
-        if (selectedCategory === 'consistency') return ['4', '5', '6'].includes(a.id);
-        if (selectedCategory === 'reward') return ['7'].includes(a.id);
-        if (selectedCategory === 'legendary') return ['8'].includes(a.id);
-        return true;
-      });
+    ? allAchievements
+    : categoryMap[selectedCategory] ?? [];
 
-  // 총 포인트 계산
-  const totalPoints = sampleAchievements
-    .filter(a => unlockedAchievements.has(a.id))
-    .reduce((sum, a) => sum + a.points, 0);
+  // 통계
+  const stats = getStatsByCategory();
+  const totalPoints = getTotalPoints();
+
+  if (loading) {
+    return (
+      <div className="p-4 flex items-center justify-center min-h-[50vh]">
+        <motion.div
+          className="text-4xl"
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+        >
+          🏆
+        </motion.div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-4 text-center text-red-500">
+        <p>업적을 불러오는데 실패했습니다.</p>
+        <p className="text-sm mt-1">{error}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="p-4 space-y-4">
@@ -83,7 +97,7 @@ export function Achievements() {
         {categories.map((category, index) => (
           <motion.button
             key={category.id}
-            onClick={() => setSelectedCategory(category.id as 'all' | 'challenge' | 'consistency' | 'reward' | 'legendary')}
+            onClick={() => setSelectedCategory(category.id as typeof selectedCategory)}
             className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
               selectedCategory === category.id
                 ? 'bg-gradient-to-r from-cat-orange to-cat-pink text-white shadow-lg'
@@ -110,16 +124,19 @@ export function Achievements() {
           exit={{ opacity: 0, x: -20 }}
           transition={{ duration: 0.3 }}
         >
-          {filteredAchievements.map((achievement, index) => (
-            <AchievementBadge
-              key={achievement.id}
-              achievement={achievement}
-              isUnlocked={unlockedAchievements.has(achievement.id)}
-              progress={[0, 60, 33, 100, 23, 0, 80, 10][index]}
-              onUnlock={() => {}}
-              size="md"
-            />
-          ))}
+          {filteredAchievements.length === 0 ? (
+            <p className="text-center text-gray-400 py-8">이 카테고리에 업적이 없습니다.</p>
+          ) : (
+            filteredAchievements.map((achievement) => (
+              <AchievementBadge
+                key={achievement.id}
+                achievement={achievement}
+                isUnlocked={isAchievementUnlocked(achievement.id)}
+                progress={getProgressByAchievement(achievement.id)}
+                size="md"
+              />
+            ))
+          )}
         </motion.div>
       </AnimatePresence>
 
@@ -133,9 +150,9 @@ export function Achievements() {
         <h3 className="font-semibold mb-3">📊 업적 통계</h3>
         <div className="grid grid-cols-3 gap-3">
           {[
-            { label: '완료', value: unlockedAchievements.size, color: 'text-green-500' },
-            { label: '진행 중', value: sampleAchievements.length - unlockedAchievements.size, color: 'text-orange-500' },
-            { label: '잠김', value: sampleAchievements.length - sampleAchievements.filter(a => unlockedAchievements.has(a.id)).length, color: 'text-gray-500' },
+            { label: '완료', value: stats.overall.unlocked, color: 'text-green-500' },
+            { label: '진행 중', value: stats.overall.total - stats.overall.unlocked, color: 'text-orange-500' },
+            { label: '달성률', value: `${stats.overall.percentage}%`, color: 'text-blue-500' },
           ].map((stat, index) => (
             <motion.div
               key={stat.label}

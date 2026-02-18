@@ -229,6 +229,74 @@ export const supabaseHelpers = {
     return data;
   },
 
+  // 사용자 아이템 관련
+  async getUserItems(userId: string) {
+    const { data, error } = await supabase
+      .from('user_items')
+      .select('*, items(*)')
+      .eq('user_id', userId)
+      .order('acquired_at', { ascending: false });
+    if (error) throw error;
+    return data;
+  },
+
+  async addUserItem(userId: string, itemId: string, quantity: number = 1) {
+    // 이미 같은 아이템이 있으면 수량 증가
+    const { data: existing } = await supabase
+      .from('user_items')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('item_id', itemId)
+      .maybeSingle();
+
+    if (existing) {
+      const { data, error } = await supabase
+        .from('user_items')
+        .update({ quantity: existing.quantity + quantity })
+        .eq('id', existing.id)
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    } else {
+      const { data, error } = await supabase
+        .from('user_items')
+        .insert({
+          user_id: userId,
+          item_id: itemId,
+          quantity,
+          is_used: false,
+          acquired_at: new Date().toISOString(),
+        })
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    }
+  },
+
+  async useUserItem(userItemId: string) {
+    const { data: item } = await supabase
+      .from('user_items')
+      .select('*')
+      .eq('id', userItemId)
+      .single();
+
+    if (!item || item.quantity <= 0) throw new Error('아이템이 없습니다.');
+
+    const newQuantity = item.quantity - 1;
+    if (newQuantity <= 0) {
+      const { error } = await supabase.from('user_items').delete().eq('id', userItemId);
+      if (error) throw error;
+    } else {
+      const { error } = await supabase
+        .from('user_items')
+        .update({ quantity: newQuantity })
+        .eq('id', userItemId);
+      if (error) throw error;
+    }
+  },
+
   // 업적 관련
   async getAchievements() {
     const { data, error } = await supabase

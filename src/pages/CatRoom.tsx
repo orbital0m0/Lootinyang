@@ -1,36 +1,26 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { useUser } from '../hooks';
+import { useUser, useItems } from '../hooks';
+import type { UserItem } from '../types';
 
-interface Item {
-  id: string;
-  name: string;
-  icon: string;
-  category: 'clothes' | 'hat' | 'necklace' | 'toy' | 'glasses';
-  unlocked: boolean;
-  equipped?: boolean;
+// 아이템 타입을 카테고리에 매핑
+function getItemCategory(type: string): string {
+  switch (type) {
+    case 'protection': return 'necklace';
+    case 'special': return 'hat';
+    default: return 'toy';
+  }
 }
-
-const CAT_ITEMS: Item[] = [
-  { id: 'scarf1', name: '빨간 스카프', icon: '🧣', category: 'clothes', unlocked: true, equipped: true },
-  { id: 'hat1', name: '밀짚모자', icon: '👒', category: 'hat', unlocked: true },
-  { id: 'neck1', name: '빨간 목도리', icon: '🎀', category: 'necklace', unlocked: true },
-  { id: 'lock1', name: '잠김', icon: '🔒', category: 'toy', unlocked: false },
-  { id: 'glasses1', name: '노란 안경', icon: '🕶️', category: 'glasses', unlocked: true },
-  { id: 'bell1', name: '방울', icon: '🔔', category: 'necklace', unlocked: true },
-  { id: 'fish1', name: '생선 인형', icon: '🐟', category: 'toy', unlocked: true },
-  { id: 'yarn1', name: '털실뭉치', icon: '🧶', category: 'toy', unlocked: true },
-];
 
 export function CatRoom() {
   const { user } = useUser();
   const navigate = useNavigate();
+  const { items: userItems, loading } = useItems(user?.id);
+
   const [activeTab, setActiveTab] = useState<'closet' | 'room'>('closet');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [items, setItems] = useState<Item[]>(CAT_ITEMS);
-  const [coins] = useState(1250);
-  const [nextBoxProgress] = useState(85);
+  const [equippedIds, setEquippedIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (!user) {
@@ -43,21 +33,34 @@ export function CatRoom() {
     { id: 'hat', label: '모자' },
     { id: 'necklace', label: '목걸이' },
     { id: 'toy', label: '장난감' },
-    { id: 'glasses', label: '안경' },
   ];
 
-  const filteredItems = selectedCategory === 'all'
-    ? items
-    : items.filter(item => item.category === selectedCategory);
+  // 카테고리별 필터링
+  const filteredItems = useMemo(() => {
+    if (selectedCategory === 'all') return userItems;
+    return userItems.filter((ui: UserItem) => {
+      const cat = getItemCategory(ui.item?.type ?? 'random');
+      return cat === selectedCategory;
+    });
+  }, [userItems, selectedCategory]);
 
-  const handleItemClick = (itemId: string) => {
-    setItems(prevItems =>
-      prevItems.map(item => ({
-        ...item,
-        equipped: item.id === itemId ? !item.equipped : item.equipped,
-      }))
-    );
+  const handleItemClick = (userItemId: string) => {
+    setEquippedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(userItemId)) {
+        next.delete(userItemId);
+      } else {
+        next.add(userItemId);
+      }
+      return next;
+    });
   };
+
+  // 장착 포인트 총합 (코인 대용)
+  const totalPoints = userItems.reduce((sum: number, ui: UserItem) => sum + ui.quantity, 0);
+
+  // 장착 아이템 프리뷰
+  const equippedItems = userItems.filter((ui: UserItem) => equippedIds.has(ui.id));
 
   return (
     <div className="flex flex-col min-h-screen bg-background-light pb-[84px] page-enter">
@@ -82,14 +85,14 @@ export function CatRoom() {
       {/* Progress Bar */}
       <div className="px-6 py-2">
         <div className="flex items-center justify-between mb-1">
-          <span className="text-[11px] font-bold text-slate-500">다음 상자까지</span>
-          <span className="text-[11px] font-bold text-highlight">{nextBoxProgress}%</span>
+          <span className="text-[11px] font-bold text-slate-500">보유 아이템</span>
+          <span className="text-[11px] font-bold text-highlight">{totalPoints}개</span>
         </div>
         <div className="w-full h-3 bg-white/40 rounded-full overflow-hidden">
           <motion.div
             className="h-full bg-highlight rounded-full"
             initial={{ width: 0 }}
-            animate={{ width: `${nextBoxProgress}%` }}
+            animate={{ width: `${Math.min((totalPoints / 20) * 100, 100)}%` }}
             transition={{ duration: 0.8 }}
           />
         </div>
@@ -109,26 +112,26 @@ export function CatRoom() {
           >
             <div className="text-[120px]">🐱</div>
             {/* Equipped Items Display */}
-            {items.filter(i => i.equipped).map(item => (
+            {equippedItems.map((ui: UserItem) => (
               <motion.span
-                key={item.id}
+                key={ui.id}
                 className="absolute text-3xl"
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 style={{
-                  top: item.category === 'hat' ? '-10px' : '50%',
-                  right: item.category === 'necklace' ? '-20px' : undefined,
+                  top: getItemCategory(ui.item?.type ?? 'random') === 'hat' ? '-10px' : '50%',
+                  right: getItemCategory(ui.item?.type ?? 'random') === 'necklace' ? '-20px' : undefined,
                 }}
               >
-                {item.icon}
+                {ui.item?.icon ?? '❓'}
               </motion.span>
             ))}
           </motion.div>
 
-          {/* Coins Display */}
+          {/* Points Display */}
           <div className="absolute top-4 right-4 bg-white px-3 py-1.5 rounded-full shadow-sm flex items-center gap-1.5">
             <span className="material-symbols-outlined text-highlight text-sm">potted_plant</span>
-            <span className="text-sm font-bold text-slate-700">{coins.toLocaleString()}</span>
+            <span className="text-sm font-bold text-slate-700">{totalPoints}</span>
           </div>
         </div>
       </div>
@@ -168,48 +171,59 @@ export function CatRoom() {
 
         {/* Items Grid */}
         <div className="grid grid-cols-4 gap-4 p-2 mt-2 h-48 overflow-y-auto hide-scrollbar">
-          <AnimatePresence>
-            {filteredItems.map((item, index) => (
+          {loading ? (
+            <div className="col-span-4 flex items-center justify-center">
               <motion.div
-                key={item.id}
-                className="flex flex-col items-center gap-2"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
+                className="text-2xl"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
               >
-                <button
-                  onClick={() => item.unlocked && handleItemClick(item.id)}
-                  disabled={!item.unlocked}
-                  className={`w-full aspect-square rounded-2xl flex items-center justify-center relative overflow-hidden p-2 transition-all ${
-                    item.equipped
-                      ? 'bg-highlight/10 border-2 border-highlight'
-                      : item.unlocked
-                      ? 'bg-slate-50 border-2 border-transparent hover:border-slate-200'
-                      : 'bg-slate-50 border-2 border-transparent opacity-40'
-                  }`}
-                >
-                  <span className={`text-3xl ${!item.unlocked ? 'blur-[1px]' : ''}`}>
-                    {item.icon}
-                  </span>
-                  {item.equipped && (
-                    <div className="absolute top-1 right-1 bg-highlight rounded-full size-4 flex items-center justify-center">
-                      <span className="material-symbols-outlined text-[10px] text-white font-bold">
-                        check
-                      </span>
-                    </div>
-                  )}
-                  {!item.unlocked && (
-                    <span className="material-symbols-outlined absolute text-slate-400">
-                      lock
-                    </span>
-                  )}
-                </button>
-                <span className={`text-[10px] font-bold ${item.equipped ? 'text-highlight' : 'text-slate-400'}`}>
-                  {item.equipped ? '착용 중' : item.name}
-                </span>
+                🧶
               </motion.div>
-            ))}
-          </AnimatePresence>
+            </div>
+          ) : filteredItems.length === 0 ? (
+            <div className="col-span-4 flex items-center justify-center text-gray-400 text-sm">
+              보유한 아이템이 없어요
+            </div>
+          ) : (
+            <AnimatePresence>
+              {filteredItems.map((userItem: UserItem, index: number) => {
+                const isEquipped = equippedIds.has(userItem.id);
+                return (
+                  <motion.div
+                    key={userItem.id}
+                    className="flex flex-col items-center gap-2"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                  >
+                    <button
+                      onClick={() => handleItemClick(userItem.id)}
+                      className={`w-full aspect-square rounded-2xl flex items-center justify-center relative overflow-hidden p-2 transition-all ${
+                        isEquipped
+                          ? 'bg-highlight/10 border-2 border-highlight'
+                          : 'bg-slate-50 border-2 border-transparent hover:border-slate-200'
+                      }`}
+                    >
+                      <span className="text-3xl">
+                        {userItem.item?.icon ?? '❓'}
+                      </span>
+                      {isEquipped && (
+                        <div className="absolute top-1 right-1 bg-highlight rounded-full size-4 flex items-center justify-center">
+                          <span className="material-symbols-outlined text-[10px] text-white font-bold">
+                            check
+                          </span>
+                        </div>
+                      )}
+                    </button>
+                    <span className={`text-[10px] font-bold ${isEquipped ? 'text-highlight' : 'text-slate-400'}`}>
+                      {isEquipped ? '착용 중' : userItem.item?.name ?? '아이템'}
+                    </span>
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
+          )}
         </div>
 
         {/* Save Button */}

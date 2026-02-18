@@ -145,11 +145,15 @@ export interface UseRewardsReturn {
   loading: boolean;
   error: string | null;
   refetch: () => void;
+  createRewardBox: (type: RewardBox['type']) => Promise<RewardBox>;
+  openRewardBox: (boxId: string) => Promise<{ box: RewardBox; items: Item[] }>;
   getBoxesByType: (type: RewardBox['type']) => RewardBox[];
   getAvailableCount: (type: RewardBox['type']) => number;
   getBoxAnimationClass: (boxType: RewardBox['type']) => string;
   getBoxIcon: (boxType: RewardBox['type']) => string;
   getBoxColorTheme: (boxType: RewardBox['type']) => string;
+  isCreating: boolean;
+  isOpening: boolean;
 }
 
 export interface UseAchievementsReturn {
@@ -179,6 +183,27 @@ export interface UseAchievementsReturn {
   getTotalPoints: () => number;
   getLockedAchievements: () => Achievement[];
   getUnlockedAchievements: () => (UserAchievement & { achievement: Achievement })[];
+}
+
+// 사용자 아이템
+export interface UserItem {
+  id: string;
+  user_id: string;
+  item_id: string;
+  quantity: number;
+  is_used: boolean;
+  acquired_at: string;
+  item?: Item;
+}
+
+// 토스트 알림
+export interface Toast {
+  id: string;
+  type: 'success' | 'achievement' | 'levelup' | 'reward' | 'info';
+  title: string;
+  message?: string;
+  icon?: string;
+  duration?: number;
 }
 
 // 게임 관련 타입
