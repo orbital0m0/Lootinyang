@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // 고양이 캐릭터 감정 상태
@@ -34,29 +34,27 @@ const REACTION_CONFIG: Record<NonNullable<CatReaction>, {
 export function CatCharacter({ mood = 'normal', size = 'md', className = '', onMoodChange, triggerReaction = null, streakCount }: CatCharacterProps) {
   const [activeReaction, setActiveReaction] = useState<CatReaction>(null);
   const [reactionKey, setReactionKey] = useState(0);
-  const prevReactionRef = useRef<CatReaction>(null);
-  const timerRef = useRef<ReturnType<typeof setTimeout>>(null);
+  const [prevTrigger, setPrevTrigger] = useState<CatReaction>(null);
 
-  // 리액션 트리거 처리 (prop 변경 감지를 렌더 중 수행하여 useEffect 내 setState 회피)
-  const handleReactionChange = useCallback((reaction: CatReaction) => {
-    if (timerRef.current) clearTimeout(timerRef.current);
-    setActiveReaction(reaction);
-    setReactionKey(prev => prev + 1);
-
-    if (reaction) {
-      const config = REACTION_CONFIG[reaction];
-      timerRef.current = setTimeout(() => {
-        setActiveReaction(null);
-      }, config.duration);
-    }
-  }, []);
-
-  if (triggerReaction !== prevReactionRef.current) {
-    prevReactionRef.current = triggerReaction;
+  // React-documented pattern: adjust state during render when prop changes
+  // https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
+  if (triggerReaction !== prevTrigger) {
+    setPrevTrigger(triggerReaction);
     if (triggerReaction) {
-      handleReactionChange(triggerReaction);
+      setActiveReaction(triggerReaction);
+      setReactionKey(reactionKey + 1);
     }
   }
+
+  // Auto-dismiss timer (setState in async callback is allowed)
+  useEffect(() => {
+    if (!activeReaction) return;
+    const config = REACTION_CONFIG[activeReaction];
+    const timer = setTimeout(() => {
+      setActiveReaction(null);
+    }, config.duration);
+    return () => clearTimeout(timer);
+  }, [activeReaction]);
 
   // 리액션이 활성화되면 mood를 오버라이드
   const effectiveMood = activeReaction ? REACTION_CONFIG[activeReaction].moodOverride : mood;
