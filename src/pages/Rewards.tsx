@@ -13,8 +13,8 @@ export function Rewards() {
     loading: rewardsLoading,
     openRewardBox,
     isOpening,
-  } = useRewards(user?.id);
-  const { items: userItems, loading: itemsLoading, useItem: consumeItem } = useItems(user?.id);
+  } = useRewards(user.id);
+  const { items: userItems, loading: itemsLoading, useItem: consumeItem } = useItems(user.id);
 
   const [selectedTab, setSelectedTab] = useState<'boxes' | 'items'>('boxes');
 

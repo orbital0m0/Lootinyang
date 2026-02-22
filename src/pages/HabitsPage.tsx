@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useHabits, useDailyChecks, useUser } from '../hooks';
@@ -8,20 +8,14 @@ import type { Habit } from '../types';
 export function HabitsPage() {
   const { user } = useUser();
   const navigate = useNavigate();
-  const { habits, createHabit, deleteHabit, isCreating } = useHabits(user?.id);
-  const { checkHabit, uncheckHabit, isTodayChecked, isDateChecked, getCheckedDatesThisWeek, isChecking } = useDailyChecks(user?.id);
+  const { habits, createHabit, deleteHabit, isCreating } = useHabits(user.id);
+  const { checkHabit, uncheckHabit, isTodayChecked, isDateChecked, getCheckedDatesThisWeek, isChecking } = useDailyChecks(user.id);
 
   const [showForm, setShowForm] = useState(false);
   const [newHabitName, setNewHabitName] = useState('');
   const [newHabitFrequency, setNewHabitFrequency] = useState(4);
 
   const weekDays = ['월', '화', '수', '목', '금', '토', '일'];
-
-  useEffect(() => {
-    if (!user) {
-      navigate('/auth');
-    }
-  }, [user, navigate]);
 
   // 주간 날짜 배열 메모이제이션
   const weekDates = useMemo(() => {
@@ -54,7 +48,7 @@ export function HabitsPage() {
     : 0;
 
   const handleCreateHabit = async () => {
-    if (!newHabitName.trim() || !user?.id) return;
+    if (!newHabitName.trim()) return;
     await createHabit({
       user_id: user.id,
       name: newHabitName,

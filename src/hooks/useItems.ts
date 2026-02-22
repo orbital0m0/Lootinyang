@@ -1,5 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabaseHelpers } from '../services/supabase';
+import { getStore, setStore, STORE_KEYS } from '../services/localStore';
+import type { LocalUserItem } from '../services/localStore';
+import { ITEMS_DATA } from '../utils/constants';
 import type { UserItem } from '../types';
 
 export interface UseItemsReturn {
@@ -23,18 +25,35 @@ export function useItems(userId?: string): UseItemsReturn {
     refetch,
   } = useQuery({
     queryKey: ['userItems', userId],
-    queryFn: () => {
-      if (!userId) throw new Error('사용자 ID가 필요합니다.');
-      return supabaseHelpers.getUserItems(userId);
+    queryFn: (): UserItem[] => {
+      const stored = getStore<LocalUserItem[]>(STORE_KEYS.USER_ITEMS, []);
+      // ITEMS_DATA와 join
+      return stored.map(ui => ({
+        ...ui,
+        item: ITEMS_DATA.find(i => i.id === ui.item_id),
+      }));
     },
-    enabled: !!userId,
-    staleTime: 1000 * 60 * 5,
+    staleTime: Infinity,
+    retry: false,
   });
 
   const addItemMutation = useMutation({
-    mutationFn: async ({ itemId, quantity }: { itemId: string; quantity: number }) => {
-      if (!userId) throw new Error('사용자 ID가 필요합니다.');
-      return supabaseHelpers.addUserItem(userId, itemId, quantity);
+    mutationFn: async ({ itemId, quantity }: { itemId: string; quantity: number }): Promise<void> => {
+      const stored = getStore<LocalUserItem[]>(STORE_KEYS.USER_ITEMS, []);
+      const existing = stored.find(i => i.item_id === itemId);
+      if (existing) {
+        setStore(STORE_KEYS.USER_ITEMS, stored.map(i =>
+          i.item_id === itemId ? { ...i, quantity: i.quantity + quantity } : i
+        ));
+      } else {
+        setStore(STORE_KEYS.USER_ITEMS, [...stored, {
+          id: crypto.randomUUID(),
+          item_id: itemId,
+          quantity,
+          is_used: false,
+          acquired_at: new Date().toISOString(),
+        }]);
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['userItems', userId] });
@@ -42,15 +61,19 @@ export function useItems(userId?: string): UseItemsReturn {
   });
 
   const useItemMutation = useMutation({
-    mutationFn: async (userItemId: string) => {
-      return supabaseHelpers.useUserItem(userItemId);
+    mutationFn: async (userItemId: string): Promise<void> => {
+      const stored = getStore<LocalUserItem[]>(STORE_KEYS.USER_ITEMS, []);
+      const updated = stored
+        .map(i => i.id === userItemId ? { ...i, quantity: i.quantity - 1 } : i)
+        .filter(i => i.quantity > 0);
+      setStore(STORE_KEYS.USER_ITEMS, updated);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['userItems', userId] });
     },
   });
 
-  const addItem = async (itemId: string, quantity: number = 1) => {
+  const addItem = async (itemId: string, quantity = 1) => {
     await addItemMutation.mutateAsync({ itemId, quantity });
   };
 
@@ -59,7 +82,7 @@ export function useItems(userId?: string): UseItemsReturn {
   };
 
   const getItemCount = (itemId: string): number => {
-    const found = items.find((ui: UserItem) => ui.item_id === itemId);
+    const found = items.find(ui => ui.item_id === itemId);
     return found?.quantity ?? 0;
   };
 

@@ -1,14 +1,10 @@
-import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { PasswordChangeModal } from '../auth/PasswordChangeModal';
 
 interface SettingsTabProps {
-  onLogout: () => void;
+  onBackup: () => void;
 }
 
-export function SettingsTab({ onLogout }: SettingsTabProps) {
-  const [showPasswordChange, setShowPasswordChange] = useState(false);
-
+export function SettingsTab({ onBackup }: SettingsTabProps) {
   const notifications = [
     { name: '습관 리마인더', description: '매일 9시 알림', enabled: true },
     { name: '보상 알림', description: '상자 획득 시 알림', enabled: false },
@@ -19,11 +15,6 @@ export function SettingsTab({ onLogout }: SettingsTabProps) {
     { name: '민트', color: 'bg-cozy-sage', active: false },
     { name: '라벤더', color: 'bg-cozy-lavender', active: false },
     { name: '로즈', color: 'bg-cozy-rose', active: false },
-  ];
-
-  const accountActions = [
-    { icon: '📧', label: '이메일 변경', danger: false, onClick: () => {} },
-    { icon: '🔒', label: '비밀번호 변경', danger: false, onClick: () => setShowPasswordChange(true) },
   ];
 
   return (
@@ -126,7 +117,7 @@ export function SettingsTab({ onLogout }: SettingsTabProps) {
         </div>
       </motion.div>
 
-      {/* Account settings */}
+      {/* Data settings */}
       <motion.div
         className="card"
         initial={{ opacity: 0, y: 20 }}
@@ -134,50 +125,26 @@ export function SettingsTab({ onLogout }: SettingsTabProps) {
         transition={{ delay: 0.5 }}
       >
         <h3 className="font-display text-lg text-cozy-brown-dark mb-4 flex items-center gap-2">
-          <span aria-hidden="true">🔐</span> 계정
+          <span aria-hidden="true">💾</span> 데이터
         </h3>
         <div className="space-y-3">
-          {accountActions.map((item, index) => (
-            <motion.button
-              key={item.label}
-              onClick={item.onClick}
-              className="w-full btn-secondary text-left flex items-center gap-3"
-              whileHover={{ scale: 1.02, x: 4 }}
-              whileTap={{ scale: 0.98 }}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.55 + index * 0.08 }}
-            >
-              <span className="text-xl" aria-hidden="true">{item.icon}</span>
-              <span className="font-heading font-semibold">{item.label}</span>
-            </motion.button>
-          ))}
           <motion.button
-            onClick={onLogout}
-            className="w-full py-4 px-6 rounded-xl font-heading font-semibold text-white flex items-center justify-center gap-3 border-3"
-            style={{
-              background: 'linear-gradient(180deg, #E57373 0%, #D32F2F 100%)',
-              borderWidth: '3px',
-              borderColor: '#B71C1C',
-              boxShadow: '0 4px 0 #7F0000',
-            }}
-            whileHover={{ scale: 1.02, y: -2 }}
-            whileTap={{ scale: 0.98, y: 2 }}
+            onClick={onBackup}
+            className="w-full btn-secondary text-left flex items-center gap-3"
+            whileHover={{ scale: 1.02, x: 4 }}
+            whileTap={{ scale: 0.98 }}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.7 }}
+            transition={{ delay: 0.55 }}
           >
-            <span className="text-xl" aria-hidden="true">🚪</span>
-            <span>로그아웃</span>
+            <span className="text-xl" aria-hidden="true">📦</span>
+            <span className="font-heading font-semibold">데이터 백업/복원</span>
           </motion.button>
+          <p className="text-xs text-cozy-brown px-1">
+            백업 코드를 생성해 데이터를 안전하게 보관하세요.
+          </p>
         </div>
       </motion.div>
-
-      {/* Password Change Modal */}
-      <PasswordChangeModal
-        isOpen={showPasswordChange}
-        onClose={() => setShowPasswordChange(false)}
-      />
     </motion.div>
   );
 }

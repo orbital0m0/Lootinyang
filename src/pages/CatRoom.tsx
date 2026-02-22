@@ -1,6 +1,5 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
 import { useUser, useItems } from '../hooks';
 import type { UserItem } from '../types';
 
@@ -15,18 +14,11 @@ function getItemCategory(type: string): string {
 
 export function CatRoom() {
   const { user } = useUser();
-  const navigate = useNavigate();
-  const { items: userItems, loading } = useItems(user?.id);
+  const { items: userItems, loading } = useItems(user.id);
 
   const [activeTab, setActiveTab] = useState<'closet' | 'room'>('closet');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [equippedIds, setEquippedIds] = useState<Set<string>>(new Set());
-
-  useEffect(() => {
-    if (!user) {
-      navigate('/auth');
-    }
-  }, [user, navigate]);
 
   const categories = [
     { id: 'all', label: '전체' },

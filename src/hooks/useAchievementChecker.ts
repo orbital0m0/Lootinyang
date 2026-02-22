@@ -1,8 +1,8 @@
 import { useState, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { supabaseHelpers } from '../services/supabase';
+import { getStore, setStore, STORE_KEYS } from '../services/localStore';
+import { ACHIEVEMENTS_DATA } from '../utils/constants';
 import { useToast } from './useToast';
-import type { Achievement, UserAchievement } from '../types';
 
 export interface AchievementCheckContext {
   userId: string;
@@ -36,8 +36,6 @@ function evaluateCondition(condition: string, ctx: AchievementCheckContext): boo
     case 'reach_level_50':
       return ctx.level >= 50;
     case 'perfect_month':
-      // perfect_month는 별도의 복잡한 계산이 필요하므로
-      // 여기서는 false 반환하고, 월말 체크 시 별도 로직으로 처리
       return false;
     default:
       return false;
@@ -53,50 +51,31 @@ export function useAchievementChecker(): UseAchievementCheckerReturn {
     if (isChecking) return [];
     setIsChecking(true);
 
-    const unlockedIds: string[] = [];
+    const newlyUnlocked: string[] = [];
 
     try {
-      // 모든 업적 목록 가져오기 (캐시에서 시도)
-      let allAchievements = queryClient.getQueryData<Achievement[]>(['achievements']);
-      if (!allAchievements) {
-        allAchievements = await supabaseHelpers.getAchievements();
-      }
+      const allAchievements = ACHIEVEMENTS_DATA;
+      const unlockedIds = getStore<string[]>(STORE_KEYS.USER_ACHIEVEMENTS, []);
+      const unlockedSet = new Set(unlockedIds);
 
-      // 사용자가 이미 달성한 업적 목록
-      let userAchievements = queryClient.getQueryData<UserAchievement[]>(['userAchievements', context.userId]);
-      if (!userAchievements) {
-        userAchievements = await supabaseHelpers.getUserAchievements(context.userId);
-      }
-
-      const unlockedSet = new Set(
-        userAchievements.map((ua: UserAchievement) => ua.achievement_id)
-      );
-
-      // 미달성 업적에 대해 조건 검사
       for (const achievement of allAchievements) {
         if (unlockedSet.has(achievement.id)) continue;
 
-        const met = evaluateCondition(achievement.condition, context);
-        if (met) {
-          try {
-            await supabaseHelpers.unlockAchievement(context.userId, achievement.id);
-            unlockedIds.push(achievement.id);
+        if (evaluateCondition(achievement.condition, context)) {
+          setStore(STORE_KEYS.USER_ACHIEVEMENTS, [...unlockedIds, ...newlyUnlocked, achievement.id]);
+          newlyUnlocked.push(achievement.id);
 
-            showToast({
-              type: 'achievement',
-              title: `업적 달성: ${achievement.name}`,
-              message: achievement.description,
-              icon: achievement.icon,
-              duration: 4000,
-            });
-          } catch (err) {
-            console.error(`업적 ${achievement.id} 달성 저장 실패:`, err);
-          }
+          showToast({
+            type: 'achievement',
+            title: `업적 달성: ${achievement.name}`,
+            message: achievement.description,
+            icon: achievement.icon,
+            duration: 4000,
+          });
         }
       }
 
-      // 캐시 갱신
-      if (unlockedIds.length > 0) {
+      if (newlyUnlocked.length > 0) {
         queryClient.invalidateQueries({ queryKey: ['userAchievements', context.userId] });
       }
     } catch (error) {
@@ -105,7 +84,7 @@ export function useAchievementChecker(): UseAchievementCheckerReturn {
       setIsChecking(false);
     }
 
-    return unlockedIds;
+    return newlyUnlocked;
   }, [isChecking, queryClient, showToast]);
 
   return { checkAll, isChecking };

@@ -1,15 +1,40 @@
-// 기본 타입 정의
-export interface User {
+// 로컬 저장 기반 사용자 타입 (인증 없음)
+export interface LocalUser {
   id: string;
-  auth_id?: string;
   username: string;
-  email?: string;
   level: number;
   exp: number;
-  total_habits?: number;
   streak: number;
+  total_habits: number;
   created_at: string;
   updated_at: string;
+}
+
+// 하위 호환성을 위한 User 타입 별칭
+export type User = LocalUser;
+
+// 로컬 사용자 아이템 타입
+export interface LocalUserItem {
+  id: string;
+  item_id: string;
+  quantity: number;
+  is_used: boolean;
+  acquired_at: string;
+  item?: Item;
+}
+
+// 백업 데이터 타입
+export interface AppBackupData {
+  version: '1.0';
+  exportedAt: string;
+  data: {
+    user: LocalUser | null;
+    habits: Habit[];
+    daily_checks: DailyCheck[];
+    user_achievements: string[];
+    user_items: LocalUserItem[];
+    reward_boxes: RewardBox[];
+  };
 }
 
 export interface Habit {
@@ -125,10 +150,10 @@ export interface UseDailyChecksReturn {
 }
 
 export interface UseUserReturn {
-  user: User | null;
+  user: LocalUser;
   loading: boolean;
   error: string | null;
-  updateUser: (updates: Partial<User>) => Promise<void>;
+  updateUser: (updates: Partial<LocalUser>) => Promise<void>;
   addExp: (exp: number) => Promise<void>;
   updateStreak: (streak: number) => Promise<void>;
   getExpToNextLevel: () => number;
@@ -185,16 +210,8 @@ export interface UseAchievementsReturn {
   getUnlockedAchievements: () => (UserAchievement & { achievement: Achievement })[];
 }
 
-// 사용자 아이템
-export interface UserItem {
-  id: string;
-  user_id: string;
-  item_id: string;
-  quantity: number;
-  is_used: boolean;
-  acquired_at: string;
-  item?: Item;
-}
+// 사용자 아이템 (하위 호환성용 별칭)
+export type UserItem = LocalUserItem;
 
 // 토스트 알림
 export interface Toast {

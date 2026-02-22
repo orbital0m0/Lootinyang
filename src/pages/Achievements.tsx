@@ -14,7 +14,7 @@ export function Achievements() {
     isAchievementUnlocked,
     getTotalPoints,
     getProgressByAchievement,
-  } = useAchievements(user?.id);
+  } = useAchievements(user.id);
 
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'challenge' | 'consistency' | 'reward' | 'legendary'>('all');
 

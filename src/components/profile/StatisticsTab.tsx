@@ -1,13 +1,13 @@
 import { motion } from 'framer-motion';
-import type { User } from '../../types';
+import type { LocalUser } from '../../types';
 
 interface StatisticsTabProps {
-  user: User | null;
+  user: LocalUser;
 }
 
 export function StatisticsTab({ user }: StatisticsTabProps) {
   const stats = [
-    { icon: '🔥', value: user?.streak || 7, label: '연속 일수', bgClass: 'from-orange-400 to-red-400' },
+    { icon: '🔥', value: user.streak, label: '연속 일수', bgClass: 'from-orange-400 to-red-400' },
     { icon: '✅', value: 42, label: '전체 체크', bgClass: 'from-cozy-sage to-green-500' },
     { icon: '📅', value: '85%', label: '달성률', bgClass: 'from-game-exp to-blue-400' },
     { icon: '🏆', value: 12, label: '업적', bgClass: 'from-cozy-lavender to-purple-500' },

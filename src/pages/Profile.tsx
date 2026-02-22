@@ -1,28 +1,22 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUser } from '../hooks';
-import { supabase } from '../services/supabase';
-import { useNavigate } from 'react-router-dom';
 import { ProfileHeader, LevelCard, StatisticsTab, SettingsTab } from '../components/profile';
+import { BackupModal } from '../components/BackupModal';
 
 export function Profile() {
   const { user } = useUser();
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'stats' | 'settings'>('stats');
   const [showLevelUp, setShowLevelUp] = useState(false);
+  const [backupOpen, setBackupOpen] = useState(false);
 
-  const level = user?.level || 5;
-  const exp = user?.exp || 350;
+  const level = user.level;
+  const exp = user.exp;
   const expToNext = level * 100;
 
   const handleLevelUp = () => {
     setShowLevelUp(true);
     setTimeout(() => setShowLevelUp(false), 2000);
-  };
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate('/auth');
   };
 
   return (
@@ -89,7 +83,7 @@ export function Profile() {
           </div>
         ) : (
           <div id="settings-panel" role="tabpanel" aria-labelledby="settings-tab">
-            <SettingsTab onLogout={handleLogout} />
+            <SettingsTab onBackup={() => setBackupOpen(true)} />
           </div>
         )}
       </AnimatePresence>
@@ -108,6 +102,8 @@ export function Profile() {
         </div>
         <p className="text-xs text-cozy-brown-light mt-2">Lootinyang v1.0.0</p>
       </motion.div>
+
+      <BackupModal isOpen={backupOpen} onClose={() => setBackupOpen(false)} />
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useUser, useHabits, useDailyChecks, useRewards, useGameEvents } from '../hooks';
@@ -8,16 +8,10 @@ import type { Habit } from '../types';
 export function Home() {
   const { user } = useUser();
   const navigate = useNavigate();
-  const { habits } = useHabits(user?.id);
-  const { checkHabit, uncheckHabit, isTodayChecked, getCheckedDatesThisWeek } = useDailyChecks(user?.id);
-  const { availableBoxes } = useRewards(user?.id);
+  const { habits } = useHabits(user.id);
+  const { checkHabit, uncheckHabit, isTodayChecked, getCheckedDatesThisWeek } = useDailyChecks(user.id);
+  const { availableBoxes } = useRewards(user.id);
   const gameEvents = useGameEvents();
-
-  useEffect(() => {
-    if (!user) {
-      navigate('/auth');
-    }
-  }, [user, navigate]);
 
   // "보상까지 N일" 실제 계산
   const daysUntilReward = useMemo(() => {
@@ -42,11 +36,9 @@ export function Home() {
     } else {
       await checkHabit(habitId, today);
       // 게임 이벤트 처리 (경험치, 스트릭, 업적)
-      if (user) {
-        await gameEvents.processHabitCheck(habitId, user.id);
-        // 주간 목표 달성 체크
-        await gameEvents.processWeeklyTarget(user.id, habits);
-      }
+      await gameEvents.processHabitCheck(habitId, user.id);
+      // 주간 목표 달성 체크
+      await gameEvents.processWeeklyTarget(user.id, habits);
     }
   };
 
@@ -81,30 +73,28 @@ export function Home() {
       </div>
 
       {/* User Stats Bar */}
-      {user && (
-        <motion.div
-          className="mx-6 mb-2 flex items-center justify-between bg-white/70 rounded-xl px-4 py-2"
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-slate-500">Lv.{user.level}</span>
-            <div className="w-20 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-              <motion.div
-                className="h-full bg-gradient-to-r from-cat-orange to-cat-pink rounded-full"
-                initial={{ width: 0 }}
-                animate={{ width: `${(user.exp % 100)}%` }}
-                transition={{ duration: 0.6 }}
-              />
-            </div>
+      <motion.div
+        className="mx-6 mb-2 flex items-center justify-between bg-white/70 rounded-xl px-4 py-2"
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+      >
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-bold text-slate-500">Lv.{user.level}</span>
+          <div className="w-20 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+            <motion.div
+              className="h-full bg-gradient-to-r from-cat-orange to-cat-pink rounded-full"
+              initial={{ width: 0 }}
+              animate={{ width: `${(user.exp % 100)}%` }}
+              transition={{ duration: 0.6 }}
+            />
           </div>
-          <div className="flex items-center gap-3 text-xs text-slate-500">
-            <span>🔥 {user.streak}일</span>
-            <span>📦 {availableBoxes.length}</span>
-          </div>
-        </motion.div>
-      )}
+        </div>
+        <div className="flex items-center gap-3 text-xs text-slate-500">
+          <span>🔥 {user.streak}일</span>
+          <span>📦 {availableBoxes.length}</span>
+        </div>
+      </motion.div>
 
       {/* Reward Box Section */}
       <motion.div

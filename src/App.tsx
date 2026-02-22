@@ -8,9 +8,8 @@ import { Rewards } from './pages/Rewards';
 import { Profile } from './pages/Profile';
 import { Achievements } from './pages/Achievements';
 import { CatRoom } from './pages/CatRoom';
-import { DatabaseTest } from './pages/DatabaseTest';
-import { AuthPage } from './pages/Auth';
-import { ResetPassword } from './pages/ResetPassword';
+import { Onboarding } from './pages/Onboarding';
+import { DataWarningBanner } from './components/DataWarningBanner';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ErrorFallback } from './components/ErrorFallback';
 import { ToastProvider } from './components/Toast';
@@ -34,16 +33,16 @@ function PageTransition({ children }: { children: React.ReactNode }) {
   );
 }
 
-// React Query 클라이언트 생성
+// React Query 클라이언트 생성 (localStorage 기반이므로 staleTime: Infinity, retry: 0)
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 5, // 5분
-      retry: 3,
+      staleTime: Infinity,
+      retry: false,
       refetchOnWindowFocus: false,
     },
     mutations: {
-      retry: 1,
+      retry: false,
     },
   },
 });
@@ -53,7 +52,7 @@ function RouterErrorFallback() {
   return (
     <ErrorFallback
       error={new Error('페이지를 찾을 수 없습니다.')}
-      resetError={() => window.location.href = '/'}
+      resetError={() => { window.location.href = '/'; }}
       type="page"
     />
   );
@@ -90,20 +89,11 @@ const router = createBrowserRouter([
         path: 'cat-room',
         element: <PageTransition><CatRoom /></PageTransition>,
       },
-      {
-        path: 'test',
-        element: <PageTransition><DatabaseTest /></PageTransition>,
-      },
     ],
   },
   {
-    path: '/auth',
-    element: <PageTransition><AuthPage /></PageTransition>,
-    errorElement: <RouterErrorFallback />,
-  },
-  {
-    path: '/reset-password',
-    element: <PageTransition><ResetPassword /></PageTransition>,
+    path: '/onboarding',
+    element: <PageTransition><Onboarding /></PageTransition>,
     errorElement: <RouterErrorFallback />,
   },
 ]);
@@ -115,6 +105,7 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <ToastProvider>
           <div className="min-h-screen bg-gray-50">
+            <DataWarningBanner />
             <RouterProvider router={router} />
           </div>
         </ToastProvider>
