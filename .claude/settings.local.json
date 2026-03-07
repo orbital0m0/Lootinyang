@@ -20,7 +20,21 @@
       "Bash(find:*)",
       "Bash(npm test:*)",
       "Bash(npx vercel --version)",
-      "Bash(npx vercel:*)"
+      "Bash(npx vercel:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx vite build:*)",
+      "Bash(npm run dev:*)",
+      "Bash(timeout:*)",
+      "Bash(ping:*)",
+      "Bash(npx vite)",
+      "Skill(bkit:pdca)",
+      "Skill(pdca)",
+      "Bash(echo 포트 5173 사용 중인 프로세스 없음:*)",
+      "Bash(netstat -ano)",
+      "Bash(xargs -I {} taskkill /F /PID {})",
+      "Bash(curl:*)",
+      "Bash(sed:*)",
+      "Bash(node:*)"
     ]
   }
 }

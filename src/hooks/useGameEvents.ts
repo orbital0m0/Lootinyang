@@ -10,6 +10,7 @@ import type { Habit, RewardBox } from '../types';
 export interface UseGameEventsReturn {
   processHabitCheck: (habitId: string, userId: string) => Promise<void>;
   processWeeklyTarget: (userId: string, habits: Habit[]) => Promise<void>;
+  streak: number;
   isProcessing: boolean;
 }
 
@@ -147,39 +148,67 @@ export function useGameEvents(): UseGameEventsReturn {
       });
 
       if (allTargetsMet && habits.length > 0) {
+        const current = getStore<LocalUser | null>(STORE_KEYS.USER, null);
+        const newWeeklyStreak = (current?.weekly_streak ?? 0) + 1;
+
         // 주간 보상 상자 생성
         const boxes = getStore<RewardBox[]>(STORE_KEYS.REWARD_BOXES, []);
-        const newBox: RewardBox = {
+        const newBoxes: RewardBox[] = [...boxes, {
           id: crypto.randomUUID(),
           user_id: userId,
           type: 'weekly',
           is_opened: false,
           items: [],
           created_at: new Date().toISOString(),
-        };
-        setStore(STORE_KEYS.REWARD_BOXES, [...boxes, newBox]);
+        }];
 
-        // 주간 보너스 경험치
-        const current = getStore<LocalUser | null>(STORE_KEYS.USER, null);
+        // 3주 연속 달성 시 특별 상자 추가
+        if (newWeeklyStreak >= 3 && newWeeklyStreak % 3 === 0) {
+          newBoxes.push({
+            id: crypto.randomUUID(),
+            user_id: userId,
+            type: 'special',
+            is_opened: false,
+            items: [],
+            created_at: new Date().toISOString(),
+          });
+        }
+        setStore(STORE_KEYS.REWARD_BOXES, newBoxes);
+
+        // 주간 보너스 경험치 + weekly_streak 업데이트
         if (current) {
           const newExp = current.exp + APP_CONFIG.WEEKLY_REWARD_EXP;
           const newLevel = Math.min(
             Math.floor(newExp / APP_CONFIG.EXP_PER_LEVEL) + 1,
             APP_CONFIG.MAX_LEVEL
           );
-          setStore(STORE_KEYS.USER, { ...current, exp: newExp, level: newLevel, updated_at: new Date().toISOString() });
+          setStore(STORE_KEYS.USER, {
+            ...current,
+            exp: newExp,
+            level: newLevel,
+            weekly_streak: newWeeklyStreak,
+            updated_at: new Date().toISOString(),
+          });
         }
 
         queryClient.invalidateQueries({ queryKey: ['currentUser'] });
         queryClient.invalidateQueries({ queryKey: ['rewardBoxes', userId] });
 
+        const isSpecialWeek = newWeeklyStreak >= 3 && newWeeklyStreak % 3 === 0;
         showToast({
           type: 'reward',
-          title: '주간 목표 달성!',
+          title: isSpecialWeek ? '3주 연속 달성! 특별 상자 획득!' : '주간 목표 달성!',
           message: `보상 상자 + ${APP_CONFIG.WEEKLY_REWARD_EXP} EXP 획득!`,
-          icon: '',
+          icon: isSpecialWeek ? '' : '',
           duration: 4000,
         });
+      } else {
+        // 주간 목표 실패 시 weekly_streak 리셋
+        const current = getStore<LocalUser | null>(STORE_KEYS.USER, null);
+        if (current && (current.weekly_streak ?? 0) > 0) {
+          setStore(STORE_KEYS.USER, { ...current, weekly_streak: 0, updated_at: new Date().toISOString() });
+          queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+        }
       }
     } catch (error) {
       console.error('주간 목표 처리 실패:', error);
@@ -188,5 +217,6 @@ export function useGameEvents(): UseGameEventsReturn {
     }
   }, [isProcessing, queryClient, showToast]);
 
-  return { processHabitCheck, processWeeklyTarget, isProcessing };
+  const currentStreak = getStore<LocalUser | null>(STORE_KEYS.USER, null)?.streak ?? 0;
+  return { processHabitCheck, processWeeklyTarget, streak: currentStreak, isProcessing };
 }

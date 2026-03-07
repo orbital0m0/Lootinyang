@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html class="light" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ee2b7c",
+                        "background-light": "#e0f2fe",
+                        "background-dark": "#0c1a25",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "Pretendard", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        body {
+            font-family: "Plus Jakarta Sans", "Pretendard", sans-serif;
+            min-height: 100dvh;
+        }
+        .custom-scroll::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark flex flex-col font-display pb-[84px]">
+<div class="flex items-center bg-transparent p-4 pb-2 justify-between safe-top">
+<div class="text-slate-800 dark:text-slate-100 flex size-12 shrink-0 items-center justify-start cursor-pointer">
+<span class="material-symbols-outlined">arrow_back_ios_new</span>
+</div>
+<h2 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">내 고양이와 방 꾸미기</h2>
+<div class="flex w-12 items-center justify-end">
+<button class="flex size-10 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-white/50 dark:bg-white/10 text-primary">
+<span class="material-symbols-outlined">shopping_bag</span>
+</button>
+</div>
+</div>
+<div class="px-6 py-2">
+<div class="flex items-center justify-between mb-1">
+<span class="text-[11px] font-bold text-slate-500 dark:text-slate-400">다음 상자까지</span>
+<span class="text-[11px] font-bold text-primary">85%</span>
+</div>
+<div class="w-full h-3 bg-white/40 dark:bg-white/10 rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 85%"></div>
+</div>
+</div>
+<div class="flex-grow flex flex-col items-center justify-center p-6 relative">
+<div class="w-full max-w-sm aspect-square relative rounded-xl bg-white/30 dark:bg-white/5 backdrop-blur-sm border-4 border-white/50 dark:border-white/10 flex items-center justify-center overflow-hidden">
+<div class="absolute bottom-10 w-48 h-12 bg-primary/20 rounded-[100%] blur-sm"></div>
+<div class="relative w-48 h-48 flex items-center justify-center">
+<div class="w-full h-full bg-contain bg-center bg-no-repeat" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBrBBqa9yDR485pXp3oBHmOY60jfMlNNQ2F4CoLjkaHfbUrLaDWJzj8dhC3E1eZjY72LhhedI42QwOK24601A47N0CAtu4jJni2yqiQcGOpHQUOqAdEOo2Y7sX5bz6t8DeW246nBjCK5hST2K3EMg4qGEYUH2cjH_9Y8I2gWkkpSDT-eJnVX2YP273D0sh-APZMhRnfYNoo0KLSpW16IIHcqsYgTnGYnG4rOIajU9mNUUrNSe8Ds7LSMHOTXw3CJDSPrv8J64-zrXd1');"></div>
+<div class="absolute top-4 left-1/2 -translate-x-1/2 w-16 h-10 bg-contain bg-center bg-no-repeat" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAhMepYYTbn_gG6FiqLVFdtc_YCHiFMaAE5SDq6o71YD3UoKYcJTyrBUTDaXVqOxDu1wpQgwDEnXwK2D55NOWB28J8PTLrTmbmXoN5oiT1rPx9i5GgawEPDCQEJ0Q7qHLyhx6LNlcmNQq-D9oQBU_D4uWlQIlL52qApugmJ1UJKy3Q24hIL4u6xnaq6lQN7KLyUzvl_lEVdeLxhy_QcPHzu15L9TIofoNvIFqtF3YZu946OnQRm2aYj7-Tkw1tn4vD5Q5ZPy-mzTrCI');"></div>
+</div>
+<div class="absolute top-4 right-4 bg-white dark:bg-slate-800 px-3 py-1.5 rounded-full shadow-sm flex items-center gap-1.5">
+<span class="material-symbols-outlined text-primary text-sm">potted_plant</span>
+<span class="text-sm font-bold text-slate-700 dark:text-slate-200">1,250</span>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900 rounded-t-[2.5rem] shadow-2xl p-4">
+<div class="flex px-2 py-3">
+<div class="flex h-12 flex-1 items-center justify-center rounded-full bg-background-light dark:bg-slate-800 p-1">
+<label class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-full px-2 has-[:checked]:bg-white dark:has-[:checked]:bg-slate-700 has-[:checked]:shadow-sm has-[:checked]:text-primary text-slate-500 text-sm font-bold transition-all">
+<span class="truncate">옷장</span>
+<input checked="" class="invisible w-0" name="category-switch" type="radio" value="Closet"/>
+</label>
+<label class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-full px-2 has-[:checked]:bg-white dark:has-[:checked]:bg-slate-700 has-[:checked]:shadow-sm has-[:checked]:text-primary text-slate-500 text-sm font-bold transition-all">
+<span class="truncate">방 꾸미기</span>
+<input class="invisible w-0" name="category-switch" type="radio" value="Room"/>
+</label>
+</div>
+</div>
+<div class="flex gap-2 overflow-x-auto px-2 py-2 custom-scroll">
+<button class="px-4 py-2 rounded-full bg-primary text-white text-xs font-bold whitespace-nowrap">전체</button>
+<button class="px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-bold whitespace-nowrap">모자</button>
+<button class="px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-bold whitespace-nowrap">목걸이</button>
+<button class="px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-bold whitespace-nowrap">장난감</button>
+<button class="px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-bold whitespace-nowrap">안경</button>
+</div>
+<div class="grid grid-cols-4 gap-4 p-2 mt-2 h-48 overflow-y-auto custom-scroll">
+<div class="flex flex-col items-center gap-2">
+<div class="w-full aspect-square rounded-2xl bg-primary/10 border-2 border-primary flex items-center justify-center relative overflow-hidden p-2">
+<div class="w-full h-full bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBKuBJ1LJaN5LnET1LLwKA_KE9tn3KNEqAMfJheh7UDjjWBVHGDse3JMHaA92Bnu0roacwg2HkDqt_PsZ_cyCx8kT6SDTURbLQIkl09MMIcRemGE5yQeVtVPFY6HIUSplZkxaVSvbe3Rt1GaVqeoLRZ5jr-xcmovlM1Zk-day0O1SXpHN_d_l7dJP8zNKok3OY7BqSfuDZKPdi6IvXBm-D2L6cgYJE2BF_1XWMlXXS3Y8ia2dI1YFAscNsHnh2qRMA6Y7kmxH9ULlX8');"></div>
+<div class="absolute top-1 right-1 bg-primary rounded-full size-4 flex items-center justify-center">
+<span class="material-symbols-outlined text-[10px] text-white font-bold">check</span>
+</div>
+</div>
+<span class="text-[10px] font-bold text-primary">착용 중</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-full aspect-square rounded-2xl bg-slate-50 dark:bg-slate-800 border-2 border-transparent flex items-center justify-center overflow-hidden p-2">
+<div class="w-full h-full bg-cover bg-center grayscale opacity-60" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD7JHzUSnE1Ge61buZ83GlkcOtte2T5j8HUu__dDTuzXKNWv1wNzMarvelpxHIIro89lTdH-q36XV6ST-gf1wFEv179JrLSV59wFTtTfi29IJGUIWowvbyOCmklzndK6hQbyBPUfHmbjd5hS83VcnceoO6G78eljFJQOe_8J82tB0tidvvrZ03BeNCyp1-fW6wv6oUta5aErj3aOwBI2XKw4FXh5LdhggvgvUhT8yVGppRkPw8jT1C6mrfsg4JY1wyzh7Zo60VECudr');"></div>
+</div>
+<span class="text-[10px] font-bold text-slate-400">밀짚모자</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-full aspect-square rounded-2xl bg-slate-50 dark:bg-slate-800 border-2 border-transparent flex items-center justify-center overflow-hidden p-2">
+<div class="w-full h-full bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBR5_DnKLnWRnwG_QhqB_wdZzfi5a4khxuGyA2-pBuBSQVTqZxYAH34J-86xKzpMLhJ0l7WYyLU3k9PocdvdPQugQpFADdvNXJqa5Ex2gGf1OZjEtUqqa-ewEb4XAg0r8qSUiUIQoya6k9_9BcNrakg7Z1HSqAXfaNcAOgDbVXN1nHuo9fJOg8Fv5wa4gtKs0P2S38yj3QGeJML0bOONjUnwPhFceEvLt2zseT5tUqpD2iF1vdAlAsQUGnU1wmYIEZ0OghaBD8ev8yW');"></div>
+</div>
+<span class="text-[10px] font-bold text-slate-400">빨간 목도리</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-full aspect-square rounded-2xl bg-slate-50 dark:bg-slate-800 border-2 border-transparent flex items-center justify-center overflow-hidden p-2 relative">
+<div class="w-full h-full bg-cover bg-center blur-[1px] opacity-40" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDjD2KryAaavDhaRR0033dhip4CHrfpGW_dPqnRJZPyz7JuWzGTf1SyNCBYsPguQExVrx9BsLjEY5x4If-9OVTjPhiXe_jYhp4XQjSs5wHo08NuIq8Ttoj9l1UnEB1Yt7gxDnsRHx_wJHEaj-mLlPVkft9fI4-eGpJGuU3yq71PqUMcue1npEu_-f8YElWJARsavE-sck56r91okTzHNSj2zBPilkcHDaSUNLQMOp6mDq3-TXbOnRyevKG7cifJsUXB9kvh2I66tTgw');"></div>
+<span class="material-symbols-outlined absolute text-slate-400">lock</span>
+</div>
+<span class="text-[10px] font-bold text-slate-400">잠김</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-full aspect-square rounded-2xl bg-slate-50 dark:bg-slate-800 border-2 border-transparent flex items-center justify-center overflow-hidden p-2">
+<div class="w-full h-full bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBt8babdg5hjQLukY5QCNz7rueL_OtL-0Z6QGIJfxqARRCuNhYlwNeKtJjQInKlOy84GM55sVCfiVcrGRbnS0KGTmUPlYHS9ClrBJ7FxeDNajVVyDwyZzaaSH-jdEaDpS1JKc3htM2yD25BjsuQZH7kSlBdzN7k6Ifj30NlnZAW6Aqo71Bi841Gw2y9BCzkYnWvASpBSKwEj5gD7TKzZBdOELhjvl89PQKRAi-6W0KXgIoOX10jR7J0C6zgS7FyKGu3k6MgEzKUUmyq');"></div>
+</div>
+<span class="text-[10px] font-bold text-slate-400">노란 안경</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-full aspect-square rounded-2xl bg-slate-50 dark:bg-slate-800 border-2 border-transparent flex items-center justify-center overflow-hidden p-2">
+<div class="w-full h-full bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDOYoETlyhysyf4OiSPImvKa8tmlbEBj53UynAwtkazsQDil5aIOrWDhkxaSelClzoxB7Xd3UH-wa9OEbvSysD4vcffztry0MQkZ7exgM0ww2TknuK9tr81HpXj_MdooLQnklryIX3TJ3DlLbOw5OuFJdl_gySfz-I05gXdd8A12aeJ4K34r3I1N1s2d4YC3vOohX0MSvQV4WBNc1qhftftcl7bGfWPEG8DLk-86dmm3xvKY2OvwWmHDnEkZAFvy9HXvkPcSeF9xZBE');"></div>
+</div>
+<span class="text-[10px] font-bold text-slate-400">방울</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-full aspect-square rounded-2xl bg-slate-50 dark:bg-slate-800 border-2 border-transparent flex items-center justify-center overflow-hidden p-2">
+<div class="w-full h-full bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAoVx7SBc2btIURQEigUiPl6XdN1b4J8-u3oPjQgS4exN5dKuzDBkysNfOnm9wTq4oJTrL7Sqi1BJ9oRE8o-OUr917YC4A9VDoiU-0DHZ0nGze5xReCo70K-Nyd40OP-F57tffFZQiKQQHHBjWULXrRgcOxUUEOn9DRj_SxoJObdCTvCZVrSq4Lo2-jLRo1v85UrdnfiSu4cDmnG_LG8BllwH9iEVTskBTfNDOxRx_znuVRWLdbKtnJdaK5PGurkURGA9bI8TtVQrX-');"></div>
+</div>
+<span class="text-[10px] font-bold text-slate-400">생선 인형</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-full aspect-square rounded-2xl bg-slate-50 dark:bg-slate-800 border-2 border-transparent flex items-center justify-center overflow-hidden p-2">
+<div class="w-full h-full bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDTzIsBoivG6ZKno8z84wT0qyKzYCAZFVP3cvDxBJa3vKU3dZnEdK1rtpW64VthIhyYh_DXeSDxfk8eSf5Spmi7HArahq58EMtIlYxHyYVQMZ3lBWzavFt8WgLfp_SBBTmkFitnvXAGK_6rfOupK1dq5ACMN3nz5i7GhGv6vRNk6SJVFb2ez76Q73LXqeGjJ0VDIf3sDid-jQcgfNml6qlKA7cLlCJRX5BVMZ0uzGpzlaNKU2LioKYeCSKyUbEkeTpmBHVedni9STd4');"></div>
+</div>
+<span class="text-[10px] font-bold text-slate-400">털실뭉치</span>
+</div>
+</div>
+<div class="flex px-2 py-3 mt-2">
+<button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-5 flex-1 bg-primary text-white text-base font-bold leading-normal tracking-[0.015em] shadow-lg shadow-primary/30">
+<span class="truncate">스타일 저장하기</span>
+</button>
+</div>
+</div>
+<div class="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-100 dark:border-slate-800 px-6 pt-3 pb-6 flex justify-between items-center z-50">
+<button class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500">
+<span class="material-symbols-outlined text-[24px]">home</span>
+<span class="text-[10px] font-bold">홈</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500">
+<span class="material-symbols-outlined text-[24px]">leaderboard</span>
+<span class="text-[10px] font-bold">통계</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-[24px] fill-1">pets</span>
+<span class="text-[10px] font-bold">고양이 방</span>
+</button>
+</div>
+
+</body></html>

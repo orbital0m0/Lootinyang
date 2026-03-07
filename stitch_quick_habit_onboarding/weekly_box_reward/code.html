@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html class="light" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#3E9CFD", // Light Blue
+                        "accent": "#F5418F",  // Pink accent
+                        "background-light": "#F2F5F8",
+                        "background-dark": "#101012",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        @layer base {
+            body {
+                font-family: 'Plus Jakarta Sans', sans-serif;
+                min-height: max(884px, 100dvh);
+            }
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .reward-glow {
+            box-shadow: 0 10px 40px -10px rgba(62, 156, 253, 0.25);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen flex flex-col font-display transition-colors duration-300">
+<div class="relative flex h-full min-h-screen w-full flex-col max-w-[430px] mx-auto overflow-x-hidden shadow-2xl bg-white dark:bg-[#1C1C1E]">
+<div class="flex items-center p-4 pb-2 justify-between">
+<div class="text-zinc-400 flex size-12 shrink-0 items-center justify-start cursor-pointer">
+<span class="material-symbols-outlined text-2xl">close</span>
+</div>
+<h2 class="text-zinc-900 dark:text-zinc-100 text-lg font-bold leading-tight tracking-tight flex-1 text-center pr-12">경험치 보상 상자 열기</h2>
+</div>
+<div class="px-6 pt-6 flex flex-col items-center">
+<div class="bg-primary/5 dark:bg-primary/10 px-6 py-4 rounded-3xl flex flex-col items-center gap-1 border border-primary/10 w-full">
+<span class="text-zinc-500 dark:text-zinc-400 text-xs font-bold uppercase tracking-wider">보유 중인 경험치</span>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[28px]">stars</span>
+<span class="text-zinc-900 dark:text-zinc-100 text-3xl font-extrabold">2,450 EXP</span>
+</div>
+</div>
+</div>
+<div class="px-6 text-center">
+<h1 class="text-zinc-900 dark:text-zinc-100 tracking-tight text-[28px] font-extrabold leading-tight pb-2 pt-8">
+                상자를 열어 보상을 확인하세요!
+            </h1>
+<p class="text-zinc-500 dark:text-zinc-400 text-base font-medium">500 EXP를 사용하여 상자를 열 수 있습니다</p>
+</div>
+<div class="relative px-6 py-8 flex flex-col items-center justify-center min-h-[320px]">
+<div class="absolute inset-0 flex items-center justify-center overflow-hidden">
+<div class="w-64 h-64 bg-primary/10 blur-[100px] rounded-full absolute -top-10"></div>
+<div class="w-48 h-48 bg-accent/10 blur-[80px] rounded-full absolute bottom-10 right-10"></div>
+</div>
+<div class="relative z-10 w-full flex flex-col items-center">
+<div class="reward-glow bg-white dark:bg-[#2C2C2E] p-8 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 mb-4 transform hover:scale-105 transition-transform duration-500 cursor-pointer group">
+<div class="w-40 h-40 bg-gradient-to-br from-primary to-[#86C3FF] rounded-3xl flex flex-col items-center justify-center relative overflow-hidden shadow-lg group-hover:shadow-primary/20">
+<div class="absolute top-0 left-0 w-full h-1/2 bg-white/10 border-b border-white/20"></div>
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-accent rounded-full border-4 border-white flex items-center justify-center z-10 shadow-md">
+<span class="material-symbols-outlined text-white text-2xl">lock_open</span>
+</div>
+<span class="material-symbols-outlined text-white/90 text-[80px]">inventory_2</span>
+</div>
+</div>
+<div class="w-48 h-12 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center border-b-4 border-zinc-200 dark:border-zinc-700 opacity-60">
+<div class="w-32 h-1 bg-white/20 rounded-full blur-sm"></div>
+</div>
+</div>
+</div>
+<div class="px-6 text-center">
+<h2 class="text-zinc-900 dark:text-white text-[20px] font-bold leading-tight tracking-tight pb-2">스트릭 보호권 획득 가능</h2>
+<p class="text-zinc-500 dark:text-zinc-400 text-[14px] font-medium leading-relaxed px-6">
+                상자에서 낮은 확률로 스트릭 보호권이나 <br/>특별한 아바타 아이템이 나옵니다.
+            </p>
+</div>
+<div class="flex-grow"></div>
+<div class="px-6 pb-10 flex flex-col gap-3">
+<button class="w-full bg-primary hover:bg-primary/90 active:scale-[0.98] transition-all text-white font-bold text-lg py-5 rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined">redeem</span>
+                경험치로 상자 열기
+            </button>
+<button class="w-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-400 font-bold text-base py-4 rounded-2xl transition-colors">
+                다음에 하기
+            </button>
+<p class="text-zinc-400 dark:text-zinc-500 text-xs text-center font-medium mt-2 flex items-center justify-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-accent">auto_awesome</span>
+                습관 형성 상위 5% 사용자입니다!
+            </p>
+</div>
+</div>
+
+</body></html>
