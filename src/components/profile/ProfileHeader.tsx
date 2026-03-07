@@ -1,14 +1,12 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import type { User } from '../../types';
+import type { LocalUser } from '../../types';
 
 interface ProfileHeaderProps {
-  user: User | null;
+  user: LocalUser;
   showLevelUp: boolean;
 }
 
 export function ProfileHeader({ user, showLevelUp }: ProfileHeaderProps) {
-  const level = user?.level || 5;
-
   return (
     <motion.div
       className="card-reward text-center relative overflow-hidden"
@@ -39,8 +37,8 @@ export function ProfileHeader({ user, showLevelUp }: ProfileHeaderProps) {
           🐱
         </div>
         {/* Level badge */}
-        <div className="level-badge absolute -bottom-1 -right-1 w-10 h-10 text-base" aria-label={`레벨 ${level}`}>
-          {level}
+        <div className="level-badge absolute -bottom-1 -right-1 w-10 h-10 text-base" aria-label={`레벨 ${user.level}`}>
+          {user.level}
         </div>
         <AnimatePresence>
           {showLevelUp && (
@@ -57,7 +55,7 @@ export function ProfileHeader({ user, showLevelUp }: ProfileHeaderProps) {
       </motion.div>
 
       <h2 className="font-display text-2xl text-cozy-brown-dark mb-1">
-        {user?.username || '냥냥이'}
+        {user.username}
       </h2>
       <p className="text-sm text-cozy-brown font-body" role="status" aria-live="polite">
         {showLevelUp ? '🎉 레벨업! 🎉' : '습관의 달인을 향해 성장 중!'}
@@ -68,10 +66,10 @@ export function ProfileHeader({ user, showLevelUp }: ProfileHeaderProps) {
         className="streak-badge mt-4 inline-flex"
         animate={{ scale: [1, 1.05, 1] }}
         transition={{ repeat: Infinity, duration: 2 }}
-        aria-label={`${user?.streak || 7}일 연속 달성`}
+        aria-label={`${user.streak}일 연속 달성`}
       >
         <span aria-hidden="true">🔥</span>
-        <span>{user?.streak || 7}일 연속</span>
+        <span>{user.streak}일 연속</span>
       </motion.div>
     </motion.div>
   );

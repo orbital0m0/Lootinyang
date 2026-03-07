@@ -6,10 +6,9 @@ interface LevelCardProps {
   exp: number;
   expToNext: number;
   showLevelUp: boolean;
-  onLevelUpTest: () => void;
 }
 
-export function LevelCard({ level, exp, expToNext, showLevelUp, onLevelUpTest }: LevelCardProps) {
+export function LevelCard({ level, exp, expToNext, showLevelUp }: LevelCardProps) {
   return (
     <motion.div
       className="card"
@@ -28,15 +27,6 @@ export function LevelCard({ level, exp, expToNext, showLevelUp, onLevelUpTest }:
         showLevelUp={showLevelUp}
         size="md"
       />
-      <motion.button
-        onClick={onLevelUpTest}
-        className="w-full btn-cat mt-4"
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-        aria-label="레벨업 테스트 실행"
-      >
-        <span className="mr-2" aria-hidden="true">🎯</span> 레벨업 테스트
-      </motion.button>
     </motion.div>
   );
 }

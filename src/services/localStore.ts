@@ -10,7 +10,22 @@ export const STORE_KEYS = {
   REWARD_BOXES: 'lootinyang_reward_boxes',
   ONBOARDED: 'lootinyang_onboarded',
   WARNED: 'lootinyang_warned',
+  SETTINGS: 'lootinyang_settings',
 } as const;
+
+// 앱 설정 타입
+export interface AppSettings {
+  notifications: {
+    habitReminder: boolean;
+    rewardAlert: boolean;
+  };
+  theme: 'default' | 'mint' | 'lavender' | 'rose';
+}
+
+export const DEFAULT_SETTINGS: AppSettings = {
+  notifications: { habitReminder: true, rewardAlert: false },
+  theme: 'default',
+};
 
 // localStorage 비활성화 환경 대비 메모리 폴백
 const memoryStore = new Map<string, string>();
@@ -97,6 +112,8 @@ export interface LocalUser {
   exp: number;
   streak: number;
   total_habits: number;
+  weekly_streak?: number;      // 연속 주간 목표 달성 횟수
+  equipped_items?: string[];   // 장착된 userItem ID 목록
   created_at: string;
   updated_at: string;
 }

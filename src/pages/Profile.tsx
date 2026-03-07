@@ -7,30 +7,23 @@ import { BackupModal } from '../components/BackupModal';
 export function Profile() {
   const { user } = useUser();
   const [activeTab, setActiveTab] = useState<'stats' | 'settings'>('stats');
-  const [showLevelUp, setShowLevelUp] = useState(false);
   const [backupOpen, setBackupOpen] = useState(false);
 
   const level = user.level;
   const exp = user.exp;
   const expToNext = level * 100;
 
-  const handleLevelUp = () => {
-    setShowLevelUp(true);
-    setTimeout(() => setShowLevelUp(false), 2000);
-  };
-
   return (
     <div className="p-4 pb-24 space-y-5 page-enter">
       {/* Profile Header */}
-      <ProfileHeader user={user} showLevelUp={showLevelUp} />
+      <ProfileHeader user={user} showLevelUp={false} />
 
       {/* Level Card */}
       <LevelCard
         level={level}
         exp={exp}
         expToNext={expToNext}
-        showLevelUp={showLevelUp}
-        onLevelUpTest={handleLevelUp}
+        showLevelUp={false}
       />
 
       {/* Tab Navigation */}

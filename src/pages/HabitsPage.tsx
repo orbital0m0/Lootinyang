@@ -88,7 +88,7 @@ export function HabitsPage() {
           <span className="material-symbols-outlined text-2xl">arrow_back_ios</span>
         </button>
         <h2 className="text-lg font-bold leading-tight tracking-tight flex-1 text-center">
-          통계 및 업적
+          나의 습관
         </h2>
         <div className="flex w-12 items-center justify-end">
           <button className="flex size-12 cursor-pointer items-center justify-center rounded-full bg-transparent hover:bg-gray-100 transition-colors">
@@ -104,9 +104,7 @@ export function HabitsPage() {
             <p className="text-sm font-semibold text-primary">이번 주 성취도</p>
             <div className="flex items-baseline gap-2">
               <p className="text-4xl font-bold tracking-tight">{completionRate}%</p>
-              <p className="text-sm font-bold text-success-600 bg-success-50 px-2 py-0.5 rounded-full">
-                +{Math.round(completionRate * 0.12)}%
-              </p>
+
             </div>
           </div>
 

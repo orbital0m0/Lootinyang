@@ -1,29 +1,58 @@
 import { motion } from 'framer-motion';
 import type { LocalUser } from '../../types';
+import { useHabits } from '../../hooks/useHabits';
+import { useDailyChecks } from '../../hooks/useDailyChecks';
+import { useAchievements } from '../../hooks/useAchievements';
 
 interface StatisticsTabProps {
   user: LocalUser;
 }
 
 export function StatisticsTab({ user }: StatisticsTabProps) {
+  const { habits } = useHabits(user.id);
+  const { dailyChecks, getWeeklyProgress } = useDailyChecks(user.id);
+  const { getUnlockedAchievements } = useAchievements(user.id);
+
+  // 전체 체크 수
+  const totalChecks = dailyChecks.filter(c => c.completed).length;
+
+  // 달성률 (최근 30일)
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  const cutoff = thirtyDaysAgo.toISOString().split('T')[0];
+  const recentChecks = dailyChecks.filter(c => c.completed && c.date >= cutoff).length;
+  const maxPossible = habits.length * 30;
+  const completionRate = maxPossible > 0
+    ? `${Math.round((recentChecks / maxPossible) * 100)}%`
+    : '-';
+
+  // 업적
+  const unlockedAchievements = getUnlockedAchievements();
+
   const stats = [
     { icon: '🔥', value: user.streak, label: '연속 일수', bgClass: 'from-orange-400 to-red-400' },
-    { icon: '✅', value: 42, label: '전체 체크', bgClass: 'from-cozy-sage to-green-500' },
-    { icon: '📅', value: '85%', label: '달성률', bgClass: 'from-game-exp to-blue-400' },
-    { icon: '🏆', value: 12, label: '업적', bgClass: 'from-cozy-lavender to-purple-500' },
+    { icon: '✅', value: totalChecks, label: '전체 체크', bgClass: 'from-cozy-sage to-green-500' },
+    { icon: '📅', value: completionRate, label: '달성률', bgClass: 'from-game-exp to-blue-400' },
+    { icon: '🏆', value: unlockedAchievements.length, label: '업적', bgClass: 'from-cozy-lavender to-purple-500' },
   ];
 
-  const achievements = [
-    { icon: '🎯', name: '첫 습관', color: 'bg-game-exp' },
-    { icon: '🔥', name: '7일 연속', color: 'bg-cozy-orange' },
-    { icon: '⭐', name: '10회 달성', color: 'bg-game-gold' },
-  ];
+  // 최근 업적 3개
+  const recentAchievements = unlockedAchievements.slice(0, 3).map(ua => ({
+    icon: ua.achievement.icon,
+    name: ua.achievement.name,
+  }));
 
-  const weeklyStats = [
-    { name: '운동하기', icon: '💪', progress: 66, completed: 2, target: 3 },
-    { name: '독서하기', icon: '📚', progress: 80, completed: 4, target: 5 },
-    { name: '명상하기', icon: '🧘', progress: 40, completed: 2, target: 5 },
-  ];
+  // 주간 습관 통계 (최대 5개)
+  const weeklyStats = habits.slice(0, 5).map(habit => {
+    const progress = getWeeklyProgress(habit.id, habit.weekly_target);
+    const completed = Math.round((progress / 100) * habit.weekly_target);
+    return {
+      name: habit.name,
+      progress,
+      completed,
+      target: habit.weekly_target,
+    };
+  });
 
   return (
     <motion.div
@@ -79,32 +108,36 @@ export function StatisticsTab({ user }: StatisticsTabProps) {
           <span className="animate-sparkle inline-block" aria-hidden="true">🏆</span>
           최근 업적
         </h3>
-        <div className="grid grid-cols-3 gap-3" role="list" aria-label="최근 업적 목록">
-          {achievements.map((achievement, index) => (
-            <motion.div
-              key={achievement.name}
-              className={`card-achievement ${achievement.color} p-3`}
-              initial={{ opacity: 0, scale: 0.5 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.5 + index * 0.1 }}
-              whileHover={{ scale: 1.1, y: -4, rotate: 2 }}
-              whileTap={{ scale: 0.95 }}
-              role="listitem"
-            >
+        {recentAchievements.length > 0 ? (
+          <div className="grid grid-cols-3 gap-3" role="list" aria-label="최근 업적 목록">
+            {recentAchievements.map((achievement, index) => (
               <motion.div
-                className="text-2xl mb-1"
-                animate={{ rotate: [0, -10, 10, 0], scale: [1, 1.1, 1] }}
-                transition={{ duration: 2, repeat: Infinity, delay: index * 0.3 }}
-                aria-hidden="true"
+                key={achievement.name}
+                className="card-achievement bg-game-exp p-3"
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.5 + index * 0.1 }}
+                whileHover={{ scale: 1.1, y: -4, rotate: 2 }}
+                whileTap={{ scale: 0.95 }}
+                role="listitem"
               >
-                {achievement.icon}
+                <motion.div
+                  className="text-2xl mb-1"
+                  animate={{ rotate: [0, -10, 10, 0], scale: [1, 1.1, 1] }}
+                  transition={{ duration: 2, repeat: Infinity, delay: index * 0.3 }}
+                  aria-hidden="true"
+                >
+                  {achievement.icon}
+                </motion.div>
+                <p className="text-xs font-heading font-semibold text-cozy-brown-dark">
+                  {achievement.name}
+                </p>
               </motion.div>
-              <p className="text-xs font-heading font-semibold text-cozy-brown-dark">
-                {achievement.name}
-              </p>
-            </motion.div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-cozy-brown text-center py-4">아직 달성한 업적이 없어요 🐱</p>
+        )}
       </motion.div>
 
       {/* Weekly stats */}
@@ -118,43 +151,47 @@ export function StatisticsTab({ user }: StatisticsTabProps) {
           <span aria-hidden="true">📈</span>
           주간 통계
         </h3>
-        <div className="space-y-4" role="list" aria-label="주간 습관 통계">
-          {weeklyStats.map((habit, index) => (
-            <motion.div
-              key={habit.name}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.7 + index * 0.1 }}
-              role="listitem"
-            >
-              <div className="flex justify-between items-center mb-2">
-                <span className="font-heading font-semibold text-cozy-brown-dark flex items-center gap-2">
-                  <span aria-hidden="true">{habit.icon}</span> {habit.name}
-                </span>
-                <div className="flex items-center gap-1 bg-cozy-cream px-2 py-1 rounded-full border-2 border-cozy-brown-light text-sm">
-                  <span className="font-display text-cozy-brown-dark">{habit.completed}</span>
-                  <span className="text-cozy-brown-light">/</span>
-                  <span className="font-display text-cozy-brown">{habit.target}</span>
-                </div>
-              </div>
-              <div
-                className="progress-bar progress-bar-cat h-4"
-                role="progressbar"
-                aria-valuenow={habit.progress}
-                aria-valuemin={0}
-                aria-valuemax={100}
-                aria-label={`${habit.name} 진행률`}
+        {weeklyStats.length > 0 ? (
+          <div className="space-y-4" role="list" aria-label="주간 습관 통계">
+            {weeklyStats.map((habit, index) => (
+              <motion.div
+                key={habit.name}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.7 + index * 0.1 }}
+                role="listitem"
               >
-                <motion.div
-                  className="progress-fill progress-fill-cat"
-                  initial={{ width: 0 }}
-                  animate={{ width: `${habit.progress}%` }}
-                  transition={{ duration: 0.8, delay: 0.8 + index * 0.1 }}
-                />
-              </div>
-            </motion.div>
-          ))}
-        </div>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="font-heading font-semibold text-cozy-brown-dark">
+                    {habit.name}
+                  </span>
+                  <div className="flex items-center gap-1 bg-cozy-cream px-2 py-1 rounded-full border-2 border-cozy-brown-light text-sm">
+                    <span className="font-display text-cozy-brown-dark">{habit.completed}</span>
+                    <span className="text-cozy-brown-light">/</span>
+                    <span className="font-display text-cozy-brown">{habit.target}</span>
+                  </div>
+                </div>
+                <div
+                  className="progress-bar progress-bar-cat h-4"
+                  role="progressbar"
+                  aria-valuenow={habit.progress}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-label={`${habit.name} 진행률`}
+                >
+                  <motion.div
+                    className="progress-fill progress-fill-cat"
+                    initial={{ width: 0 }}
+                    animate={{ width: `${habit.progress}%` }}
+                    transition={{ duration: 0.8, delay: 0.8 + index * 0.1 }}
+                  />
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-cozy-brown text-center py-4">습관을 추가하면 통계가 보여요 📊</p>
+        )}
       </motion.div>
     </motion.div>
   );
