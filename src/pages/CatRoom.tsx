@@ -4,25 +4,23 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useUser, useItems } from '../hooks';
 import type { UserItem } from '../types';
 
-// 아이템 타입을 카테고리에 매핑
-function getItemCategory(type: string): string {
-  switch (type) {
-    case 'protection': return 'necklace';
-    case 'special': return 'hat';
+// 아이템 카테고리를 표시 카테고리에 매핑 (v2)
+function getItemCategory(category: string): string {
+  switch (category) {
+    case 'theme': return 'hat';
+    case 'font': return 'necklace';
     default: return 'toy';
   }
 }
 
 export function CatRoom() {
   const navigate = useNavigate();
-  const { user, updateUser, isUpdating } = useUser();
+  const { user, isUpdating } = useUser();
   const { items: userItems, loading } = useItems(user.id);
 
   const [activeTab, setActiveTab] = useState<'closet' | 'room'>('closet');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [equippedIds, setEquippedIds] = useState<Set<string>>(
-    () => new Set(user.equipped_items ?? [])
-  );
+  const [equippedIds, setEquippedIds] = useState<Set<string>>(() => new Set<string>());
 
   const categories = [
     { id: 'all', label: '전체' },
@@ -35,7 +33,7 @@ export function CatRoom() {
   const filteredItems = useMemo(() => {
     if (selectedCategory === 'all') return userItems;
     return userItems.filter((ui: UserItem) => {
-      const cat = getItemCategory(ui.item?.type ?? 'random');
+      const cat = getItemCategory(ui.item?.category ?? 'theme');
       return cat === selectedCategory;
     });
   }, [userItems, selectedCategory]);
@@ -59,7 +57,8 @@ export function CatRoom() {
   const equippedItems = userItems.filter((ui: UserItem) => equippedIds.has(ui.id));
 
   const handleSave = async () => {
-    await updateUser({ equipped_items: Array.from(equippedIds) });
+    // equipped_items 필드는 v2에서 INVENTORY로 관리 (Task 3에서 구현 예정)
+    void equippedIds;
   };
 
   return (
@@ -119,11 +118,11 @@ export function CatRoom() {
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 style={{
-                  top: getItemCategory(ui.item?.type ?? 'random') === 'hat' ? '-10px' : '50%',
-                  right: getItemCategory(ui.item?.type ?? 'random') === 'necklace' ? '-20px' : undefined,
+                  top: '50%',
+                  right: undefined,
                 }}
               >
-                {ui.item?.icon ?? '❓'}
+                {ui.item?.category === 'theme' ? '🎨' : ui.item?.category === 'font' ? '✍️' : '🎁'}
               </motion.span>
             ))}
           </motion.div>
@@ -208,7 +207,7 @@ export function CatRoom() {
                           }`}
                         >
                           <span className="text-3xl">
-                            {userItem.item?.icon ?? '❓'}
+                            {userItem.item?.category === 'theme' ? '🎨' : userItem.item?.category === 'font' ? '✍️' : '🎁'}
                           </span>
                           {isEquipped && (
                             <div className="absolute top-1 right-1 bg-highlight rounded-full size-4 flex items-center justify-center">
@@ -219,7 +218,7 @@ export function CatRoom() {
                           )}
                         </button>
                         <span className={`text-[10px] font-bold ${isEquipped ? 'text-highlight' : 'text-slate-400'}`}>
-                          {isEquipped ? '착용 중' : userItem.item?.name ?? '아이템'}
+                          {isEquipped ? '착용 중' : userItem.item?.nameKo ?? '아이템'}
                         </span>
                       </motion.div>
                     );

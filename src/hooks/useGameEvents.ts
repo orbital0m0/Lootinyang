@@ -156,18 +156,18 @@ export function useGameEvents(): UseGameEventsReturn {
         const newBoxes: RewardBox[] = [...boxes, {
           id: crypto.randomUUID(),
           user_id: userId,
-          type: 'weekly',
+          type: 'normal' as const,
           is_opened: false,
           items: [],
           created_at: new Date().toISOString(),
         }];
 
-        // 3주 연속 달성 시 특별 상자 추가
+        // 3주 연속 달성 시 프리미엄 상자 추가
         if (newWeeklyStreak >= 3 && newWeeklyStreak % 3 === 0) {
           newBoxes.push({
             id: crypto.randomUUID(),
             user_id: userId,
-            type: 'special',
+            type: 'premium' as const,
             is_opened: false,
             items: [],
             created_at: new Date().toISOString(),
@@ -197,9 +197,8 @@ export function useGameEvents(): UseGameEventsReturn {
         const isSpecialWeek = newWeeklyStreak >= 3 && newWeeklyStreak % 3 === 0;
         showToast({
           type: 'reward',
-          title: isSpecialWeek ? '3주 연속 달성! 특별 상자 획득!' : '주간 목표 달성!',
+          title: isSpecialWeek ? '3주 연속 달성! 프리미엄 상자 획득!' : '주간 목표 달성! 상자 획득!',
           message: `보상 상자 + ${APP_CONFIG.WEEKLY_REWARD_EXP} EXP 획득!`,
-          icon: isSpecialWeek ? '' : '',
           duration: 4000,
         });
       } else {

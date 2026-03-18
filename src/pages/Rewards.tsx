@@ -221,9 +221,9 @@ export function Rewards() {
                             ease: 'easeInOut',
                           }}
                         >
-                          {itemData?.icon ?? '❓'}
+                          {itemData?.category === 'theme' ? '🎨' : itemData?.category === 'font' ? '✍️' : '🎁'}
                         </motion.div>
-                        <p className="text-xs font-medium truncate">{itemData?.name ?? '알 수 없는 아이템'}</p>
+                        <p className="text-xs font-medium truncate">{itemData?.nameKo ?? '알 수 없는 아이템'}</p>
                         <p className="text-xs text-gray-500">x{userItem.quantity}</p>
                       </motion.div>
                     );
@@ -233,7 +233,7 @@ export function Rewards() {
             </motion.div>
 
             {/* 아이템 사용 */}
-            {userItems.filter((ui: UserItem) => ui.item?.type === 'protection' || ui.item?.type === 'special').length > 0 && (
+            {userItems.filter((ui: UserItem) => ui.item?.category === 'checkAnimation' || ui.item?.category === 'progressBar').length > 0 && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -242,7 +242,7 @@ export function Rewards() {
                 <h3 className="font-semibold mb-3">아이템 사용</h3>
                 <div className="space-y-2">
                   {userItems
-                    .filter((ui: UserItem) => ui.item?.type === 'protection' || ui.item?.type === 'special')
+                    .filter((ui: UserItem) => ui.item?.category === 'checkAnimation' || ui.item?.category === 'progressBar')
                     .map((userItem: UserItem, index: number) => {
                       const itemData = userItem.item;
                       const rarity = itemData?.rarity ?? 'common';
@@ -267,11 +267,11 @@ export function Rewards() {
                               animate={{ rotate: [0, 10, -10, 0] }}
                               transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
                             >
-                              {itemData?.icon ?? '❓'}
+                              {itemData?.category === 'checkAnimation' ? '✨' : '📊'}
                             </motion.span>
                             <div className="text-left">
-                              <p className="font-medium text-sm">{itemData?.name ?? '알 수 없는 아이템'} 사용</p>
-                              <p className="text-xs text-gray-500">{itemData?.description ?? ''}</p>
+                              <p className="font-medium text-sm">{itemData?.nameKo ?? '알 수 없는 아이템'} 사용</p>
+                              <p className="text-xs text-gray-500">{itemData?.rarity ?? ''}</p>
                             </div>
                           </div>
                           <span className="text-xs text-gray-500">{userItem.quantity}개</span>

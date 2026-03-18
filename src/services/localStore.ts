@@ -11,6 +11,11 @@ export const STORE_KEYS = {
   ONBOARDED: 'lootinyang_onboarded',
   WARNED: 'lootinyang_warned',
   SETTINGS: 'lootinyang_settings',
+  // v2 보상 시스템
+  INVENTORY: 'lootinyang_inventory',   // 소유 아이템 ID 목록 + 장착 상태 (UserInventory)
+  THEME: 'lootinyang_theme',           // 적용 중인 테마 ID
+  FONT: 'lootinyang_font',             // 적용 중인 폰트 ID
+  WEEKLY_PROGRESS: 'lootinyang_weekly_progress', // WeeklyProgress 기록
 } as const;
 
 // 앱 설정 타입

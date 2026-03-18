@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getStore, setStore, STORE_KEYS } from '../services/localStore';
 import type { LocalUserItem } from '../services/localStore';
-import { ITEMS_DATA } from '../utils/constants';
+import { REWARD_ITEMS } from '../utils/constants';
 import type { UserItem } from '../types';
 
 export interface UseItemsReturn {
@@ -30,7 +30,7 @@ export function useItems(userId?: string): UseItemsReturn {
       // ITEMS_DATA와 join
       return stored.map(ui => ({
         ...ui,
-        item: ITEMS_DATA.find(i => i.id === ui.item_id),
+        item: REWARD_ITEMS.find(i => i.id === ui.item_id),
       }));
     },
     staleTime: Infinity,

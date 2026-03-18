@@ -1,37 +1,40 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import type { RewardBox, Item } from '../types';
+import type { RewardBox, RewardItem } from '../types';
 
 interface RewardBoxProps {
   rewardBox: RewardBox;
   onOpen: (boxId: string) => void;
-  items?: Item[];
+  items?: RewardItem[];
 }
 
 export function RewardBoxComponent({ rewardBox, onOpen, items = [] }: RewardBoxProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [showItem, setShowItem] = useState(false);
-  const [rewardItem, setRewardItem] = useState<Item | null>(null);
+  const [rewardItem, setRewardItem] = useState<RewardItem | null>(null);
 
-  const boxIcons = {
-    daily: '📦',
-    weekly: '🎀',
-    monthly: '🌟',
-    special: '🏆',
+  const boxIcons: Record<RewardBox['type'], string> = {
+    normal: '📦',
+    premium: '🎁',
+    event: '🏆',
   };
 
-  const boxThemes = {
-    daily: 'from-cat-orange to-cat-orange-dark',
-    weekly: 'from-cat-purple to-cat-pink',
-    monthly: 'from-amber-400 to-amber-600',
-    special: 'from-gradient-to-r from-pink-500 via-red-500 to-yellow-500',
+  const boxThemes: Record<RewardBox['type'], string> = {
+    normal: 'from-blue-400 to-blue-500',
+    premium: 'from-purple-400 to-pink-500',
+    event: 'from-amber-400 to-amber-500',
   };
 
-  const boxAnimations = {
-    daily: 'animate-pulse-slow',
-    weekly: 'animate-wiggle',
-    monthly: 'animate-sparkle',
-    special: 'animate-pulse',
+  const boxAnimations: Record<RewardBox['type'], string> = {
+    normal: 'animate-pulse-slow',
+    premium: 'animate-wiggle',
+    event: 'animate-bounce',
+  };
+
+  const boxLabels: Record<RewardBox['type'], string> = {
+    normal: '일반 보상 상자',
+    premium: '프리미엄 상자',
+    event: '이벤트 상자',
   };
 
   const rarityColors = {
@@ -87,10 +90,7 @@ export function RewardBoxComponent({ rewardBox, onOpen, items = [] }: RewardBoxP
             </motion.span>
             <div>
               <h3 className="font-semibold text-gray-800">
-                {rewardBox.type === 'daily' && '일일 보상 상자'}
-                {rewardBox.type === 'weekly' && '주간 보상 상자'}
-                {rewardBox.type === 'monthly' && '월간 보상 상자'}
-                {rewardBox.type === 'special' && '특별 보상 상자'}
+                {boxLabels[rewardBox.type]}
               </h3>
               <p className="text-xs text-gray-500">
                 {rewardBox.is_opened ? '이미 열었습니다' : '오픈 가능'}
@@ -222,41 +222,51 @@ export function RewardBoxComponent({ rewardBox, onOpen, items = [] }: RewardBoxP
                       {rewardItem?.rarity === 'legendary' && '레전더리'}
                     </motion.div>
 
-                    {/* 아이템 아이콘 */}
+                    {/* 아이템 프리뷰 */}
                     <motion.div
-                      className={`w-32 h-32 mx-auto rounded-2xl border-4 flex items-center justify-center text-6xl ${
+                      className={`w-32 h-32 mx-auto rounded-2xl border-4 flex items-center justify-center overflow-hidden ${
                         rewardItem ? rarityColors[rewardItem.rarity] : ''
                       } ${rewardItem ? rarityEffects[rewardItem.rarity] : ''}`}
+                      style={
+                        rewardItem?.category === 'theme'
+                          ? { background: rewardItem.previewData['--accent'] || '#3E94E4' }
+                          : {}
+                      }
                       initial={{ rotate: -180, scale: 0 }}
                       animate={{ rotate: 0, scale: 1 }}
-                      transition={{
-                        type: 'spring',
-                        stiffness: 200,
-                        damping: 20,
-                        delay: 0.4,
-                      }}
+                      transition={{ type: 'spring', stiffness: 200, damping: 20, delay: 0.4 }}
                     >
-                      {rewardItem?.icon}
+                      <span className="text-4xl">
+                        {rewardItem?.category === 'theme' ? '🎨' :
+                         rewardItem?.category === 'font' ? '✍️' :
+                         rewardItem?.category === 'sticker' ? '🐱' :
+                         rewardItem?.category === 'checkAnimation' ? '✨' :
+                         rewardItem?.category === 'progressBar' ? '📊' : '🎁'}
+                      </span>
                     </motion.div>
 
                     {/* 아이템 정보 */}
                     <div>
+                      <motion.p
+                        className="text-xs text-gray-500 mb-1"
+                        initial={{ y: 20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.55 }}
+                      >
+                        {rewardItem?.category === 'theme' ? '테마' :
+                         rewardItem?.category === 'font' ? '폰트' :
+                         rewardItem?.category === 'sticker' ? '스티커' :
+                         rewardItem?.category === 'checkAnimation' ? '체크 애니메이션' :
+                         rewardItem?.category === 'progressBar' ? '프로그레스 바' : '아이템'}
+                      </motion.p>
                       <motion.h3
-                        className="text-2xl font-bold text-gray-800 mb-2"
+                        className="text-2xl font-bold text-gray-800 mb-1"
                         initial={{ y: 20, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
                         transition={{ delay: 0.6 }}
                       >
-                        {rewardItem?.name}
+                        {rewardItem?.nameKo}
                       </motion.h3>
-                      <motion.p
-                        className="text-gray-600"
-                        initial={{ y: 20, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        transition={{ delay: 0.7 }}
-                      >
-                        {rewardItem?.description}
-                      </motion.p>
                     </div>
 
                     {/* 닫기 버튼 */}
