@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { getStore, setStore, STORE_KEYS } from '../services/localStore';
 import { applyTheme, THEMES, getThemePreviewColor } from '../utils/themes';
+import { DEFAULT_OWNED_IDS } from './useInventory';
 import type { UserInventory } from '../types';
 import { DEFAULT_INVENTORY } from '../types';
 import { useToast } from './useToast';
@@ -26,17 +27,16 @@ export function useTheme(): UseThemeReturn {
 
   const inventory = getStore<UserInventory>(STORE_KEYS.INVENTORY, DEFAULT_INVENTORY);
 
-  // 기본 보유 테마: warm-white는 항상 보유
-  const ownedThemeIds = [
-    'warm-white',
-    ...inventory.ownedItems.filter(id => id in THEMES && id !== 'warm-white'),
-  ];
+  // 보유 테마: 기본 소유(DEFAULT_OWNED_IDS) + 획득 아이템 중 테마인 것
+  const ownedThemeIds = Object.keys(THEMES).filter(id =>
+    DEFAULT_OWNED_IDS.has(id) || inventory.ownedItems.includes(id)
+  );
 
   const setTheme = useCallback((themeId: string) => {
     if (!THEMES[themeId]) return;
 
     const inv = getStore<UserInventory>(STORE_KEYS.INVENTORY, DEFAULT_INVENTORY);
-    const isOwned = themeId === 'warm-white' || inv.ownedItems.includes(themeId);
+    const isOwned = DEFAULT_OWNED_IDS.has(themeId) || inv.ownedItems.includes(themeId);
 
     if (!isOwned) {
       showToast({
@@ -61,7 +61,7 @@ export function useTheme(): UseThemeReturn {
   }, [queryClient, showToast]);
 
   const isOwned = useCallback((themeId: string): boolean => {
-    if (themeId === 'warm-white') return true;
+    if (DEFAULT_OWNED_IDS.has(themeId)) return true;
     const inv = getStore<UserInventory>(STORE_KEYS.INVENTORY, DEFAULT_INVENTORY);
     return inv.ownedItems.includes(themeId);
   }, []);

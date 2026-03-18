@@ -10,3 +10,4 @@ export { useAchievementChecker } from './useAchievementChecker';
 export { useToast, ToastContext } from './useToast';
 export { useSettings } from './useSettings';
 export { useTheme } from './useTheme';
+export { useInventory } from './useInventory';
