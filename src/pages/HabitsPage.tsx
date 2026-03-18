@@ -98,18 +98,24 @@ export function HabitsPage() {
       </div>
 
       {/* Weekly Achievement Chart */}
-      <div className="px-4 pt-6">
-        <div className="bg-accent-blue/30 rounded-xl p-6 border border-accent-blue">
-          <div className="flex flex-col gap-1 mb-6">
-            <p className="text-sm font-semibold text-primary">이번 주 성취도</p>
-            <div className="flex items-baseline gap-2">
-              <p className="text-4xl font-bold tracking-tight">{completionRate}%</p>
-
+      <div className="px-4 pt-4">
+        <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-3xl p-5 border border-primary/10">
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <p className="text-xs font-semibold text-primary/70 mb-0.5">이번 주 성취도</p>
+              <p className="text-4xl font-bold tracking-tight text-[#1A1C1E]">{completionRate}%</p>
+            </div>
+            <div className={`size-14 rounded-2xl flex items-center justify-center ${
+              completionRate >= 100 ? 'bg-primary text-white' : 'bg-primary/10 text-primary'
+            }`}>
+              <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: completionRate >= 100 ? "'FILL' 1" : "'FILL' 0" }}>
+                {completionRate >= 100 ? 'emoji_events' : 'bar_chart'}
+              </span>
             </div>
           </div>
 
           {/* Weekly Bar Chart */}
-          <div className="grid grid-cols-7 gap-3 items-end h-[120px] px-2">
+          <div className="grid grid-cols-7 gap-2 items-end h-[100px]">
             {weekDays.map((day, index) => {
               const date = weekDates[index];
               const dayCompletions = habits.filter(h => isDateChecked(h.id, date)).length;
@@ -117,16 +123,20 @@ export function HabitsPage() {
               const isToday = date === today;
 
               return (
-                <div key={day} className="flex flex-col items-center gap-2 group">
+                <div key={day} className="flex flex-col items-center gap-1.5">
                   <motion.div
-                    className={`w-full rounded-t-full transition-all duration-500 ${
-                      isToday ? 'bg-primary' : 'bg-primary/20'
+                    className={`w-full rounded-xl transition-all duration-500 ${
+                      isToday
+                        ? 'bg-gradient-to-t from-primary to-primary/60'
+                        : percentage > 0
+                        ? 'bg-primary/30'
+                        : 'bg-primary/10'
                     }`}
                     initial={{ height: 0 }}
-                    animate={{ height: `${Math.max(percentage, 10)}%` }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    animate={{ height: `${Math.max(percentage, 8)}%` }}
+                    transition={{ duration: 0.5, delay: index * 0.07 }}
                   />
-                  <p className={`text-[11px] font-bold ${isToday ? 'text-primary' : 'text-gray-500'}`}>
+                  <p className={`text-[10px] font-bold ${isToday ? 'text-primary' : 'text-gray-400'}`}>
                     {day}
                   </p>
                 </div>
@@ -174,39 +184,41 @@ export function HabitsPage() {
             return (
               <motion.div
                 key={habit.id}
-                className="glass-card rounded-2xl p-5 ios-shadow"
+                className="glass-card p-5 ios-shadow"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
               >
                 {/* Habit Header */}
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="icon-circle">
-                    <span className="material-symbols-outlined text-2xl">{iconName}</span>
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-bold text-[#1A1C1E] text-sm">{habit.name}</p>
-                    <p className="text-[11px] text-slate-400">
-                      주 {habit.weekly_target}회 목표
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-lg font-extrabold text-[#1A1C1E]">
-                      {thisWeekChecks.length} / {habit.weekly_target}
+                <div className="flex items-center gap-3 mb-4">
+                  <div className={`size-10 rounded-2xl flex items-center justify-center flex-shrink-0 ${
+                    progress >= 100 ? 'bg-gradient-to-br from-primary to-highlight' : 'bg-primary/10'
+                  }`}>
+                    <span className={`material-symbols-outlined text-xl ${progress >= 100 ? 'text-white' : 'text-primary'}`}>
+                      {iconName}
                     </span>
-                    <span className="text-[10px] text-slate-400 block font-bold">
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-[#1A1C1E] text-sm truncate">{habit.name}</p>
+                    <p className="text-[11px] text-slate-400">주 {habit.weekly_target}회 목표</p>
+                  </div>
+                  <div className="text-right flex-shrink-0">
+                    <span className={`text-base font-extrabold ${progress >= 100 ? 'text-primary' : 'text-[#1A1C1E]'}`}>
+                      {thisWeekChecks.length}<span className="text-slate-300 font-normal text-sm">/{habit.weekly_target}</span>
+                    </span>
+                    <span className={`text-[10px] block font-bold ${progress >= 100 ? 'text-primary' : 'text-slate-400'}`}>
                       {progress >= 100 ? '완료!' : '진행중'}
                     </span>
                   </div>
                   <button
                     onClick={() => handleDeleteHabit(habit.id)}
-                    className="text-slate-400 hover:text-error-500 transition-colors"
+                    className="size-9 flex items-center justify-center rounded-xl text-slate-300 hover:text-error-500 hover:bg-error-50 transition-colors cursor-pointer flex-shrink-0"
                   >
-                    <span className="material-symbols-outlined text-xl">delete</span>
+                    <span className="material-symbols-outlined text-lg">delete</span>
                   </button>
                 </div>
 
-                {/* Weekly Check Dots */}
+                {/* Weekly Check Dots — 44px touch target */}
                 <div className="flex justify-between mb-4">
                   {weekDays.map((day, dayIndex) => {
                     const date = weekDates[dayIndex];
@@ -219,24 +231,24 @@ export function HabitsPage() {
                         key={day}
                         onClick={() => handleToggleCheck(habit.id, date)}
                         disabled={isChecking}
-                        className="flex flex-col items-center gap-1"
+                        className="flex flex-col items-center gap-1 cursor-pointer"
                       >
                         <motion.div
-                          className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
+                          className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${
                             isChecked
-                              ? 'bg-highlight text-white'
+                              ? 'bg-gradient-to-br from-primary to-highlight text-white shadow-[0_2px_8px_rgba(62,148,228,0.35)]'
                               : isToday
                               ? 'bg-primary/10 border-2 border-primary text-primary'
                               : isPast
-                              ? 'bg-slate-100 text-slate-400'
-                              : 'bg-slate-50 text-slate-300'
+                              ? 'bg-slate-100 text-slate-300'
+                              : 'bg-slate-50 text-slate-200'
                           }`}
-                          whileTap={{ scale: 0.9 }}
+                          whileTap={{ scale: 0.85 }}
                         >
                           {isChecked ? (
-                            <span className="material-symbols-outlined text-sm">check</span>
+                            <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>check</span>
                           ) : (
-                            <span className="text-xs font-bold">{day}</span>
+                            <span className="text-[11px] font-bold">{day}</span>
                           )}
                         </motion.div>
                       </button>

@@ -34,7 +34,18 @@
       "Bash(xargs -I {} taskkill /F /PID {})",
       "Bash(curl:*)",
       "Bash(sed:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(taskkill:*)",
+      "Bash(npx skills:*)",
+      "Bash(git clone --depth=1 https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git /tmp/ui-ux-pro-max-skill)",
+      "Read(//tmp/**)",
+      "Bash(cp:*)",
+      "Bash(python:*)",
+      "Bash(py:*)",
+      "Bash(cmd:*)",
+      "Bash(netstat:*)",
+      "Bash(wmic process:*)",
+      "Bash(powershell:*)"
     ]
   }
 }

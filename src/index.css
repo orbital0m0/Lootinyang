@@ -86,19 +86,17 @@
      ═══════════════════════════════════════════ */
 
   .glass-card {
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.96);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    border-radius: 1.25rem;
   }
 
   .ios-shadow {
-    box-shadow: var(--shadow-ios);
+    box-shadow: 0 4px 20px rgba(62, 148, 228, 0.10), 0 1px 4px rgba(0, 0, 0, 0.04);
   }
 
   .ios-shadow-lg {
-    box-shadow: var(--shadow-ios-lg);
+    box-shadow: 0 8px 32px rgba(62, 148, 228, 0.14), 0 2px 8px rgba(0, 0, 0, 0.06);
   }
 
   /* ═══════════════════════════════════════════
@@ -169,7 +167,7 @@
 
   .progress-fill {
     @apply h-full rounded-full transition-all duration-500;
-    background: var(--highlight);
+    background: linear-gradient(90deg, var(--primary), var(--highlight));
   }
 
   .progress-fill-primary {

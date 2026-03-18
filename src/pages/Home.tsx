@@ -74,64 +74,81 @@ export function Home() {
 
       {/* User Stats Bar */}
       <motion.div
-        className="mx-6 mb-2 flex items-center justify-between bg-white/70 rounded-xl px-4 py-2"
+        className="mx-6 mb-2 flex items-center justify-between bg-white rounded-2xl px-4 py-3 ios-shadow"
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
       >
         <div className="flex items-center gap-2">
-          <span className="text-xs font-bold text-slate-500">Lv.{user.level}</span>
-          <div className="w-20 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+          <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">Lv.{user.level}</span>
+          <div className="w-24 h-2 bg-gray-100 rounded-full overflow-hidden">
             <motion.div
-              className="h-full bg-gradient-to-r from-cat-orange to-cat-pink rounded-full"
+              className="h-full bg-gradient-to-r from-primary to-highlight rounded-full"
               initial={{ width: 0 }}
               animate={{ width: `${(user.exp % 100)}%` }}
               transition={{ duration: 0.6 }}
             />
           </div>
         </div>
-        <div className="flex items-center gap-3 text-xs text-slate-500">
-          <span>🔥 {user.streak}일</span>
-          <span>📦 {availableBoxes.length}</span>
+        <div className="flex items-center gap-3">
+          <span className="flex items-center gap-1 text-xs font-bold text-slate-600">
+            <span className="material-symbols-outlined text-base text-orange-400" style={{ fontVariationSettings: "'FILL' 1" }}>local_fire_department</span>
+            {user.streak}일
+          </span>
+          <span className="flex items-center gap-1 text-xs font-bold text-slate-600">
+            <span className="material-symbols-outlined text-base text-primary">redeem</span>
+            {availableBoxes.length}
+          </span>
         </div>
       </motion.div>
 
       {/* Reward Box Section */}
       <motion.div
-        className="flex flex-col items-center justify-center py-8"
+        className="mx-6 my-4"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="relative flex flex-col items-center">
-          <div className="relative size-32 flex items-center justify-center">
-            <span className="material-symbols-outlined !text-[80px] text-primary/40 font-extralight">
-              redeem
-            </span>
+        <button
+          onClick={() => navigate('/rewards')}
+          className={`w-full rounded-3xl p-5 flex items-center gap-4 cursor-pointer transition-all active:scale-[0.98] ${
+            availableBoxes.length > 0
+              ? 'bg-gradient-to-r from-highlight to-cat-orange text-white ios-shadow-lg'
+              : 'bg-white ios-shadow'
+          }`}
+        >
+          <div className="relative flex-shrink-0">
+            <div className={`size-14 rounded-2xl flex items-center justify-center ${
+              availableBoxes.length > 0 ? 'bg-white/20' : 'bg-primary/10'
+            }`}>
+              <span className={`material-symbols-outlined text-3xl ${
+                availableBoxes.length > 0 ? 'text-white' : 'text-primary'
+              }`} style={{ fontVariationSettings: "'FILL' 1" }}>
+                redeem
+              </span>
+            </div>
             {availableBoxes.length > 0 && (
-              <div className="absolute -top-1 -right-1">
-                <div className="bg-highlight size-3 rounded-full animate-ping absolute"></div>
-                <div className="bg-highlight size-3 rounded-full relative"></div>
-              </div>
+              <span className="absolute -top-1 -right-1 bg-white text-highlight text-[11px] font-black rounded-full size-5 flex items-center justify-center">
+                {availableBoxes.length}
+              </span>
             )}
           </div>
-          <div className="mt-4 text-center">
-            <h3 className="text-[#1A1C1E] text-lg font-bold leading-tight">
+          <div className="text-left flex-1">
+            <p className={`font-bold text-base leading-tight ${availableBoxes.length > 0 ? 'text-white' : 'text-[#1A1C1E]'}`}>
               {availableBoxes.length > 0
-                ? `미열린 보상 상자 ${availableBoxes.length}개!`
+                ? `보상 상자 ${availableBoxes.length}개 열기!`
                 : daysUntilReward > 0
                   ? `보상까지 ${daysUntilReward}일 남았어요`
-                  : '이번 주 목표를 달성했어요!'
-              }
-            </h3>
-            <p className="text-slate-500 text-sm font-medium mt-1">
-              {availableBoxes.length > 0
-                ? '보상 센터에서 상자를 열어보세요!'
-                : '조금만 더 힘내세요!'
-              }
+                  : '이번 주 목표 달성!'}
+            </p>
+            <p className={`text-sm mt-0.5 ${availableBoxes.length > 0 ? 'text-white/80' : 'text-slate-400'}`}>
+              {availableBoxes.length > 0 ? '탭해서 지금 열어보세요' : '조금만 더 힘내세요!'}
             </p>
           </div>
-        </div>
+          <span className={`material-symbols-outlined ${availableBoxes.length > 0 ? 'text-white/70' : 'text-slate-300'}`}>
+            chevron_right
+          </span>
+        </button>
       </motion.div>
 
       {/* Habits Section */}
@@ -173,34 +190,41 @@ export function Home() {
               return (
                 <motion.div
                   key={habit.id}
-                  className="glass-card rounded-2xl p-5 ios-shadow"
+                  className="glass-card p-5 ios-shadow"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
                 >
-                  <div className="flex items-center gap-4 mb-4">
-                    <input
-                      type="checkbox"
-                      checked={isCheckedToday}
-                      onChange={() => handleToggleCheck(habit.id)}
+                  <div className="flex items-center gap-3 mb-4">
+                    {/* 체크 버튼 — 44x44px 터치 타겟 */}
+                    <button
+                      onClick={() => handleToggleCheck(habit.id)}
                       disabled={gameEvents.isProcessing}
-                      className="cursor-pointer"
-                    />
-                    <div className="icon-circle">
-                      <span className="material-symbols-outlined text-2xl">{iconName}</span>
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-bold text-[#1A1C1E] text-sm">{habit.name}</p>
-                      <p className="text-[11px] text-slate-400">
-                        주 {habit.weekly_target || 5}회 목표
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-lg font-extrabold text-[#1A1C1E]">
-                        {progress.completed} / {progress.total}
+                      className={`size-11 rounded-2xl flex items-center justify-center flex-shrink-0 cursor-pointer transition-all duration-200 active:scale-90 ${
+                        isCheckedToday
+                          ? 'bg-gradient-to-br from-primary to-highlight text-white shadow-[0_4px_12px_rgba(62,148,228,0.35)]'
+                          : 'bg-gray-100 text-gray-300 hover:bg-primary/10 hover:text-primary'
+                      }`}
+                    >
+                      <span className="material-symbols-outlined text-xl" style={{ fontVariationSettings: isCheckedToday ? "'FILL' 1" : "'FILL' 0" }}>
+                        check_circle
                       </span>
-                      <span className="text-[10px] text-slate-400 block font-bold">
-                        {progress.completed >= progress.total ? '완료!' : '완료'}
+                    </button>
+                    <div className="icon-circle flex-shrink-0">
+                      <span className="material-symbols-outlined text-xl">{iconName}</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className={`font-bold text-sm truncate ${isCheckedToday ? 'text-slate-400 line-through' : 'text-[#1A1C1E]'}`}>
+                        {habit.name}
+                      </p>
+                      <p className="text-[11px] text-slate-400">주 {habit.weekly_target || 5}회 목표</p>
+                    </div>
+                    <div className="text-right flex-shrink-0">
+                      <span className={`text-base font-extrabold ${progress.completed >= progress.total ? 'text-primary' : 'text-[#1A1C1E]'}`}>
+                        {progress.completed}<span className="text-slate-300 font-normal">/{progress.total}</span>
+                      </span>
+                      <span className={`text-[10px] block font-bold ${progress.completed >= progress.total ? 'text-primary' : 'text-slate-400'}`}>
+                        {progress.completed >= progress.total ? '완료!' : '진행중'}
                       </span>
                     </div>
                   </div>
