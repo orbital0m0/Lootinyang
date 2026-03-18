@@ -9,3 +9,4 @@ export { useGameEvents } from './useGameEvents';
 export { useAchievementChecker } from './useAchievementChecker';
 export { useToast, ToastContext } from './useToast';
 export { useSettings } from './useSettings';
+export { useTheme } from './useTheme';
